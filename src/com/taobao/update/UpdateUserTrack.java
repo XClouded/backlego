@@ -1,0 +1,50 @@
+package com.taobao.update;
+
+import android.util.Log;
+import com.taobao.statistic.TBS;
+import com.taobao.tao.BaselineInfoProvider;
+import com.taobao.tao.util.StringUtil;
+
+import java.util.Properties;
+
+public class UpdateUserTrack {
+    private final static String  matoTrace = "MTAO_UPDATE_USERTRACK_ID";
+    private final static String  bundleTrace = "BUNDLE_UPDATE_USERTRACK_ID";
+    private UpdateUserTrack(){}
+    
+    /**
+     * 手淘更新usertrack
+     * @param contextMessage
+     * @param detailMessage
+     */
+    public static void mTaoUpdateTrack(String contextMessage,String detailMessage){
+        Log.i(contextMessage, detailMessage);
+        Properties mTao = new Properties();
+        mTao.setProperty(contextMessage, detailMessage);
+        TBS.Ext.commitEvent(matoTrace,mTao);
+    }
+    /**
+     * bundle更新usertrack
+     * @param contextMessage
+     * @param detailMessage
+     */
+    public static void bundleUpdateTrack(String contextMessage,String detailMessage){
+        Log.i(contextMessage, detailMessage);
+        Properties bundle = new Properties();
+        bundle.setProperty(contextMessage, detailMessage+getBaselineInfoForTrack());
+        TBS.Ext.commitEvent(bundleTrace,bundle);
+    }
+    
+    private static String getBaselineInfoForTrack(){
+        StringBuilder sb = new StringBuilder(" 老系统基线信息：主版本--> ");
+        String mainVer = BaselineInfoProvider.getInstance().getMainVersionName();
+        sb.append(mainVer);
+        sb.append(" 基线版本--> ");
+        String baselineVer = BaselineInfoProvider.getInstance().getBaselineVersion();
+        sb.append(StringUtil.isEmpty(baselineVer)==true? " is empty! ":baselineVer);
+        String bundleList = BaselineInfoProvider.getInstance().getBundleList();
+        sb.append(" bundle信息--> ");
+        sb.append(StringUtil.isEmpty(bundleList)==true? " is empty! ":bundleList);
+        return sb.toString();
+    }
+}

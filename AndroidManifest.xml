@@ -27,7 +27,7 @@
         <receiver
                 android:name="com.taobao.tao.applifetcycle.AtlasCrossActivityReceiver"
                 android:exported="false" >
-            <intent-filter>
+            <intent-filter android:priority="10">
                 <action android:name="com.taobao.intent.action.APP_STATE" />
             </intent-filter>
         </receiver>

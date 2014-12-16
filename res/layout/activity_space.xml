@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF5F5F5"
+    android:orientation="vertical" >
+
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clickable="true"
+        >
+        <ImageView 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            
+            />
+        
+    </LinearLayout>
+        
+    <FrameLayout 
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1" 
+        >
+        <TextView 
+            android:id="@+id/activity_space_no_delable_bundle_note"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="#FF3d4245"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="亲，当前没有插件可被清理"
+            
+            />
+        <ListView
+	        android:id="@+id/activity_space_bundle_list"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        >
+        </ListView>
+        
+        
+    </FrameLayout>
+    
+
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        
+        <Button 
+            android:id="@+id/activity_space_btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="退出"
+            android:background="#00000000"
+            android:textColor="#FF60AB32"
+            android:textSize="24sp"
+            android:onClick="onClick"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            />
+        <TextView 
+            android:id="@+id/activity_space_tv_total"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:textColor="#FF333333"
+            android:textSize="18sp"
+            android:gravity="left"
+            android:padding="10dp"
+            />
+        <Button 
+            android:id="@+id/activity_space_btn_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="删除"
+            android:textColor="#FF999999"
+            android:textSize="24sp"
+            android:background="#00000000"
+            android:onClick="onClick"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            />
+        
+    </LinearLayout>
+
+</LinearLayout>
