@@ -36,7 +36,7 @@ public class AtlasCrossActivityReceiver extends BroadcastReceiver{
     }
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent!=null && intent.getAction().equals("com.taobao.tao.APPSTATE_CHANGE")){
+        if(intent!=null && intent.getAction().equals("com.taobao.intent.action.APP_STATE")){
             String value = intent.getStringExtra(AppStateBroadcastManager.KEY);
            if(value.equals(AppStateBroadcastManager.START)){
                TaoLog.Logd("AtlasCrossActivityLifeCycleObserver", "Application onStart");
@@ -52,7 +52,7 @@ public class AtlasCrossActivityReceiver extends BroadcastReceiver{
                        public void run() {
                            BundleInfoManager.instance().downAndInstallHightPriorityBundleIfNeed();
                        }
-                   }, 25000);
+                   }, 25000`);
                }
            }else if(value.equals(AppStateBroadcastManager.STOP)){
                BundleInstaller.exitApp();

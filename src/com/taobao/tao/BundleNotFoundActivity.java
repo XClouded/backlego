@@ -57,6 +57,10 @@ public class BundleNotFoundActivity extends PanguActivity implements View.OnClic
             String pkgName = intent.getStringExtra(KEY_BUNDLE_PKG);
             mActivityName = intent.getStringExtra(KEY_ACTIVITY);
             mTargetBundleInfo = BundleInfoManager.instance().findBundleByActivity(mActivityName);
+            if(mTargetBundleInfo==null){
+                finish();
+                return;
+            }
             if(mTargetBundleInfo!=null && mTargetBundleInfo.getPkgName().equals("com.taobao.taoguide")){
                 mTargetBundleInfo.setName("导购栏目");
                 mTargetBundleInfo.setDesc("千万淘宝达人给你最专业的购物建议");
