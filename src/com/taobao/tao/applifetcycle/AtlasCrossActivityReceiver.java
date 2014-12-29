@@ -52,7 +52,7 @@ public class AtlasCrossActivityReceiver extends BroadcastReceiver{
                        public void run() {
                            BundleInfoManager.instance().downAndInstallHightPriorityBundleIfNeed();
                        }
-                   }, 25000`);
+                   }, 25000);
                }
            }else if(value.equals(AppStateBroadcastManager.STOP)){
                BundleInstaller.exitApp();
