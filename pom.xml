@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.taobao.android</groupId>
     <artifactId>update</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>aar</packaging>
     <name>taobaolego</name>
     <properties>
@@ -143,7 +143,7 @@
                     <androidManifestFile>
                         ${project.basedir}/AndroidManifest.xml
                     </androidManifestFile>
-                    <mergeManifests>true</mergeManifests>
+                    <mergeManifests>false</mergeManifests>
                     <dex>
                         <jvmArguments>
                             <jvmArgument>-Xmx2048M</jvmArgument>
