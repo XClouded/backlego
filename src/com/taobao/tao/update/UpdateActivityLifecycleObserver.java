@@ -5,6 +5,7 @@ package com.taobao.tao.update;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.taobao.util.Globals;
 import com.taobao.android.compat.ApplicationCompat.AbstractActivityLifecycleCallbacks;
 import com.taobao.lightapk.BundleInfoManager;
 import com.taobao.lightapk.BundleListing.BundleInfo;
@@ -35,11 +36,16 @@ public class UpdateActivityLifecycleObserver extends AbstractActivityLifecycleCa
     @Override
     public void onActivityCreated(Activity activity,
             @Nullable Bundle savedInstanceState) {
-        BundleInfo bundleInfo = BundleInfoManager.instance()
-                .findBundleByActivity(activity.getClass().getName());
-        if(bundleInfo != null){
-            StorageManager.getInstance(activity.getApplicationContext()).onBundleStarted(bundleInfo.getPkgName());
-        }
+        /**
+         * 暂时先关闭
+         */
+//        if(Globals.isMiniPackage()) {
+//            BundleInfo bundleInfo = BundleInfoManager.instance()
+//                    .findBundleByActivity(activity.getClass().getName());
+//            if (bundleInfo != null) {
+//                StorageManager.getInstance(activity.getApplicationContext()).onBundleStarted(bundleInfo.getPkgName());
+//            }
+//        }
     }
     
 }
