@@ -3,6 +3,7 @@ package com.taobao.tao;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.taobao.atlas.bundleInfo.BundleInfoList;
 import android.taobao.atlas.framework.Atlas;
 import android.taobao.atlas.runtime.ClassNotFoundInterceptorCallback;
 import android.text.TextUtils;
@@ -42,7 +43,8 @@ public class ClassNotFoundInterceptor implements ClassNotFoundInterceptorCallbac
         if(className!=null && className.equals("com.taobao.tao.welcome.Welcome")){
             return intent;
         }
-        if(Globals.isMiniPackage()) {
+        String bundleName = BundleInfoList.getInstance().getBundleForComponet(className);
+        if(Globals.isMiniPackage() || bundleName.equalsIgnoreCase("com.duanqu.qupai.recorder")) {
             Log.d(TAG, "bundle not found");
             final BundleListing.BundleInfo info = BundleInfoManager.instance().findBundleByActivity(className);
             if (info != null) {
