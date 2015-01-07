@@ -55,6 +55,33 @@ public class BundleListing implements IMTOPDataObject{
         private List<String> dependency;
         private List<String> activities;
         private List<String> services;
+        private List<String> receivers;
+        private List<String> contentProviders;
+        private boolean hasSO;
+
+        public List<String> getReceivers() {
+            return receivers;
+        }
+
+        public void setReceivers(List<String> receivers) {
+            this.receivers = receivers;
+        }
+
+        public List<String> getContentProviders() {
+            return contentProviders;
+        }
+
+        public void setContentProviders(List<String> contentProviders) {
+            this.contentProviders = contentProviders;
+        }
+
+        public boolean isHasSO() {
+            return hasSO;
+        }
+
+        public void setHasSO(boolean hasSO) {
+            this.hasSO = hasSO;
+        }
 
         public String getMd5() {
             return md5;
