@@ -55,6 +55,11 @@ public class BundleInfoManager {
         return sManager;
     }
 
+    public BundleListing getBundleListing(){
+        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
+        return listingHashMap.get(Globals.getVersionName());
+    }
+
     /*
      * 同步处理
      */
@@ -403,6 +408,20 @@ public class BundleInfoManager {
         }.execute();
          **/
     }
+
+    public static String[] internalBundles;
+//    public boolean hasLocalBundle(String packageName){
+//        if(internalBundles==null){
+//            File libDir = new File(Globals.getApplication().getFilesDir().getParentFile(), "lib");
+//            File[] layoutFolders = folder.listFiles(new FilenameFilter() {
+//
+//                @Override
+//                public boolean accept(File dir, String name) {
+//                    return name.contains("layout");
+//                }
+//            });
+//        }
+//    }
 
     private boolean canExtendSilentDownload(){
         StatFs statfs = null;
