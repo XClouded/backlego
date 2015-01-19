@@ -21,11 +21,10 @@ import mtopsdk.mtop.intf.Mtop;
 import mtopsdk.mtop.util.MtopConvert;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Created by guanjie on 14-9-15.
@@ -35,6 +34,10 @@ public class BundleInfoManager {
     public final String[] HIGH_PRIORITY_BUNDLES = new String[]{"com.taobao.passivelocation"};
     public final String TAG = "BundleInfoManager";
     private static BundleInfoManager sManager;
+    /**
+     * 本地含有的bundle,包括安装和未安装的
+     */
+    public static List<String> sInternalBundles;
     private final String BUNDLE_LIST_FILE_PREFIX = "bundleInfo-";
     private final String LIST_FILE_DIR;
     private HashMap<String,BundleListing> listingHashMap = new HashMap<String, BundleListing>(2);
@@ -351,19 +354,42 @@ public class BundleInfoManager {
         }
     }
 
+    public synchronized void resolveInternalBundles() {
+        if(sInternalBundles !=null || sInternalBundles.size()==0)
+            return ;
+        String prefix = "lib/armeabi/libcom_";
+        String suffix = ".so";
+        sInternalBundles = new ArrayList<String>();
+        try {
+            ZipFile zipFile = new ZipFile(Globals.getApplication().getApplicationInfo().sourceDir);
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry zipEntry = entries.nextElement();
+                String entryName = zipEntry.getName();
+                if (entryName.startsWith(prefix) && entryName.endsWith(suffix)) {
+                    sInternalBundles.add(entryName);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Exception while get bundles in assets or lib", e);
+        }
+    }
+
     /**
      * 静默下载高优先级bundle
      */
     public void downAndInstallHightPriorityBundleIfNeed(){
         InitBundleInfoByVersionIfNeed(Globals.getVersionName());
-//        if(NetWorkUtils.isLowNetworkMode(Globals.getApplication()) ||
-//                NetWorkUtils.getMobileNetworkType(Globals.getApplication())== NetWorkUtils.MobileNetworkType.MOBILE_NETWORK_TYPE_4G){
-//            return ;
-//        }
+        if(sInternalBundles ==null){
+            resolveInternalBundles();
+        }
+        if(sInternalBundles ==null){
+            return ;
+        }
         String joined = AppPreference.getString(HIGH_PRIORITY_BUNDLES_FORDOWNLOAD,"");
         final ArrayList<String> pkgs = new ArrayList<String>();
         for(String pkg : HIGH_PRIORITY_BUNDLES){
-            if(Atlas.getInstance().getBundle(pkg)==null){
+            if(!sInternalBundles.contains(pkg) && Atlas.getInstance().getBundle(pkg)==null){
                 pkgs.add(pkg);
             }
         }
@@ -378,7 +404,7 @@ public class BundleInfoManager {
                 if (infos != null) {
                     for (BundleListing.BundleInfo info : infos) {
                         if(info!=null && info.getPkgName()!=null){
-                            if(Atlas.getInstance().getBundle(info.getPkgName())==null && !pkgs.contains(info.getPkgName())){
+                            if(Atlas.getInstance().getBundle(info.getPkgName())==null && !sInternalBundles.contains(info.getPkgName()) && !pkgs.contains(info.getPkgName())){
                                 pkgs.add(info.getPkgName());
                             }
                         }
@@ -408,20 +434,6 @@ public class BundleInfoManager {
         }.execute();
          **/
     }
-
-    public static String[] internalBundles;
-//    public boolean hasLocalBundle(String packageName){
-//        if(internalBundles==null){
-//            File libDir = new File(Globals.getApplication().getFilesDir().getParentFile(), "lib");
-//            File[] layoutFolders = folder.listFiles(new FilenameFilter() {
-//
-//                @Override
-//                public boolean accept(File dir, String name) {
-//                    return name.contains("layout");
-//                }
-//            });
-//        }
-//    }
 
     private boolean canExtendSilentDownload(){
         StatFs statfs = null;
