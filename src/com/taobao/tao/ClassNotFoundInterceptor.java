@@ -44,7 +44,16 @@ public class ClassNotFoundInterceptor implements ClassNotFoundInterceptorCallbac
             return intent;
         }
         String bundleName = BundleInfoList.getInstance().getBundleForComponet(className);
-        if(Globals.isMiniPackage() || bundleName.equalsIgnoreCase("com.duanqu.qupai.recorder")) {
+        if(BundleInfoManager.sInternalBundles==null){
+            BundleInfoManager.instance().resolveInternalBundles();
+        }
+        boolean downloadGuide = false;
+        if(BundleInfoManager.sInternalBundles==null){
+            downloadGuide = Globals.isMiniPackage() || bundleName.equalsIgnoreCase("com.duanqu.qupai.recorder");
+        }else{
+            downloadGuide = !BundleInfoManager.sInternalBundles.contains(bundleName) && Atlas.getInstance().getBundle(bundleName)==null;
+        }
+        if(downloadGuide) {
             Log.d(TAG, "bundle not found");
             final BundleListing.BundleInfo info = BundleInfoManager.instance().findBundleByActivity(className);
             if (info != null) {
