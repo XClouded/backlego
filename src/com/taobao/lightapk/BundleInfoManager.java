@@ -355,7 +355,7 @@ public class BundleInfoManager {
     }
 
     public synchronized void resolveInternalBundles() {
-        if(sInternalBundles !=null || sInternalBundles.size()==0)
+        if(sInternalBundles !=null && sInternalBundles.size()!=0)
             return ;
         String prefix = "lib/armeabi/libcom_";
         String suffix = ".so";

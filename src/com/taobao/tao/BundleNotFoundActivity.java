@@ -49,6 +49,7 @@ public class BundleNotFoundActivity extends PanguActivity implements View.OnClic
     private boolean autoDownload = false;
     private SafeHandler mSafeHandler;
     private boolean mShowH5 = true;
+    private boolean downloadSuccess = false;
     @Override
     protected void onCreate( Bundle savedInstanceState) {
         Intent intent = getIntent();
@@ -233,6 +234,9 @@ public class BundleNotFoundActivity extends PanguActivity implements View.OnClic
     }
 
     public void goDestination(){
+        if(mSafeHandler!=null)
+            mSafeHandler.destroy();
+        downloadSuccess = true;
         if (!TextUtils.isEmpty(mH5Url)) {
             Nav.from(BundleNotFoundActivity.this).withExtras(getIntent().getExtras()).toUri(Uri.parse(mH5Url));
             finish();
@@ -336,6 +340,8 @@ public class BundleNotFoundActivity extends PanguActivity implements View.OnClic
     public boolean handleMessage(Message message) {
         switch(message.what){
             case AUTO_DOWNLOAD_CANCEL:
+                if(downloadSuccess)
+                    break;
                 if(mH5Url!=null){
                     if(mShowH5 && !TextUtils.isEmpty(mH5Url)) {
                         Nav.from(this).withCategory("com.taobao.intent.category.HYBRID_UI").toUri(Uri.parse(mH5Url));
