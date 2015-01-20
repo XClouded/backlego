@@ -54,6 +54,10 @@ public class StorageManager {
         "com.ut.share",
         "com.taobao.ruleenginebundle",
         "com.taobao.trade.order",
+            "com.taobao.trade.rate",
+            "com.taobao.dynamic",
+            "com.taobao.browser",
+            "com.taobao.calendar",
         "com.taobao.passivelocation",
         "com.taobao.taobao.map"};
     
