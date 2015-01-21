@@ -354,6 +354,13 @@ public class BundleInfoManager {
         }
     }
 
+    public static String getPackageNameFromEntryName(String entryName) {
+        String packageName = entryName.substring(entryName.indexOf("lib/armeabi/lib") + "lib/armeabi/lib".length(),
+                entryName.indexOf(".so"));
+        packageName = packageName.replace("_", ".");
+        return packageName;
+    }
+
     public synchronized void resolveInternalBundles() {
         if(sInternalBundles !=null && sInternalBundles.size()!=0)
             return ;
@@ -367,7 +374,7 @@ public class BundleInfoManager {
                 ZipEntry zipEntry = entries.nextElement();
                 String entryName = zipEntry.getName();
                 if (entryName.startsWith(prefix) && entryName.endsWith(suffix)) {
-                    sInternalBundles.add(entryName);
+                    sInternalBundles.add(getPackageNameFromEntryName(entryName));
                 }
             }
         } catch (Exception e) {

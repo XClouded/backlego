@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.taobao.android</groupId>
     <artifactId>update</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
     <packaging>aar</packaging>
     <name>taobaolego</name>
     <properties>
