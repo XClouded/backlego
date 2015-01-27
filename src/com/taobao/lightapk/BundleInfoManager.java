@@ -386,7 +386,7 @@ public class BundleInfoManager {
      * 静默下载高优先级bundle
      */
     public void downAndInstallHightPriorityBundleIfNeed(){
-        InitBundleInfoByVersionIfNeed(
+        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
         if(sInternalBundles ==null){
             resolveInternalBundles();
         }
