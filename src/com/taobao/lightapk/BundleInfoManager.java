@@ -386,7 +386,7 @@ public class BundleInfoManager {
      * 静默下载高优先级bundle
      */
     public void downAndInstallHightPriorityBundleIfNeed(){
-        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
+        InitBundleInfoByVersionIfNeed(
         if(sInternalBundles ==null){
             resolveInternalBundles();
         }
@@ -587,11 +587,13 @@ public class BundleInfoManager {
             if(bundleInfoStr==null){
                 bundleInfoStr = getFromAssets(fileName,Globals.getApplication());
             }
-            List<BundleListing.BundleInfo> infos = JSON.parseArray(bundleInfoStr, BundleListing.BundleInfo.class);
-            BundleListing listing = new BundleListing();
-            listing.setBundles(infos);
-            if(listing!=null){
-                listingHashMap.put(mainVersion,listing);
+            if(!TextUtils.isEmpty(bundleInfoStr)) {
+                List<BundleListing.BundleInfo> infos = JSON.parseArray(bundleInfoStr, BundleListing.BundleInfo.class);
+                BundleListing listing = new BundleListing();
+                listing.setBundles(infos);
+                if (listing != null) {
+                    listingHashMap.put(mainVersion, listing);
+                }
             }
         }
 
