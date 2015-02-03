@@ -52,12 +52,21 @@ public class BundleListing implements IMTOPDataObject{
         private String desc;
         private String url;
         private String md5;
+        private String host;
         private List<String> dependency;
         private List<String> activities;
         private List<String> services;
         private List<String> receivers;
         private List<String> contentProviders;
         private boolean hasSO;
+
+        public String getHost() {
+            return host;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
 
         public List<String> getReceivers() {
             return receivers;
