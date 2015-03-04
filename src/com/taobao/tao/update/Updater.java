@@ -13,9 +13,11 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.Settings;
 import android.taobao.atlas.framework.Atlas;
 import android.taobao.util.NetWork;
 import android.taobao.util.TaoLog;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -36,8 +38,11 @@ import com.taobao.update.bundle.BundleDownloader;
 import com.taobao.update.bundle.BundleInstaller;
 import com.taobao.update.bundle.BundleUpdateInfo;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -50,7 +55,7 @@ import java.util.Map;
  */
 public class Updater implements OnUpdateListener{
 	
-	
+	public static boolean dynamicdeployForTest = false;
 	public static final String UPDATER_NOTIFICATION = "update_notification";
 	
 	public static final String INSTALL_PATH = "install_path";
@@ -138,6 +143,30 @@ public class Updater implements OnUpdateListener{
 		}
 		return sInstance;
 	}
+
+    /**
+     * 开发环境下测试动态部署
+     * @param url
+     */
+    public void triggerDynamicDeployment(String targetVersionName,String url){
+        dynamicdeployForTest = true;
+        if(targetVersionName == null || !targetVersionName.equals(com.taobao.tao.Globals.getVersionName())){
+            Toast.makeText(Globals.getApplication(),"此动态部署不匹配当前的客户端版本",Toast.LENGTH_SHORT).show();
+        }
+        if(mTmpConfirm != null)
+            mTmpConfirm.cancel();
+        if(mBackgroundInstall != null)
+            mBackgroundInstall.cancel(true);
+        if(mUpdate.request(getApkPath(), TaoApplication.getTTIDNum(), Globals.getVersionName())){
+            //启动新的更新
+            mBackgroundRequest = false;
+            mTmpConfirm = null;
+            mTmpUpdateInfo = null;
+            Constants.showToast(Globals.getApplication(),"动态部署开始...(仅内测使用)");
+        }else{
+            Constants.showToast(Globals.getApplication(),"当前正在更新中");
+        }
+    }
 	
 	/**
 	 * 请求更新
@@ -216,8 +245,7 @@ public class Updater implements OnUpdateListener{
 	public static boolean isAtlasDDSuccess(){
 		return sAtlasDDSuccess;
 	}
-	
-	
+
 	@Override
 	public void onRequestResult(UpdateInfo info,
 			DownloadConfirm confirm) {
@@ -850,4 +878,5 @@ public class Updater implements OnUpdateListener{
             }
         }
     }
+
 }

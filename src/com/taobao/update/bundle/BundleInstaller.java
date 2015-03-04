@@ -9,11 +9,13 @@ import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.taobao.atlas.framework.Atlas;
 import android.util.Log;
+import android.widget.Toast;
 import com.taobao.bspatch.BSPatch;
 import com.taobao.lightapk.BundleInfoManager;
 import com.taobao.lightapk.BundleListing;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
+import com.taobao.tao.update.Updater;
 import com.taobao.update.UpdateUserTrack;
 import com.taobao.update.UpdateUtils;
 
@@ -135,6 +137,10 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
 	    if(isSucess){
 	    	String newVersion = Globals.getVersionName();
             buildBundleInventory(oldVersion,newVersion,mBaselineInfo);
+            if(Updater.dynamicdeployForTest && BundleInstaller.isInstallSuccess()){
+                Toast.makeText(Globals.getApplication(),"动态部署成功,待手淘自动退出后点击手淘启动",Toast.LENGTH_SHORT).show();
+                BundleInstaller.exitApp();
+            }
 	    }
     }
     

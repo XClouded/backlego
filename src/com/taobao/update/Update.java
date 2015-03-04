@@ -5,12 +5,18 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.StatFs;
 import android.taobao.util.TaoLog;
+import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 import com.taobao.bspatch.BSPatch;
 import com.taobao.tao.Globals;
+import com.taobao.tao.update.DDUpdateConnectorHelper;
 import com.taobao.update.Downloader.OnDownloaderListener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -52,6 +58,7 @@ public class Update{
 	
 	private DownloadConfirm mTmpDownloadConfirm;
 	private final int FOR_ENOUGH_SPACE = 2*1024*1024;
+    private String mDynamicDeployTestUrl = null;
 	
 	/**
 	 * 更新初始化
@@ -111,6 +118,28 @@ public class Update{
 //		}
 		
 	}
+
+    public boolean requestForTestDynamicDeploy(String apkPath,String appName,String version,String url){
+        if(mIsRunning) {
+            Toast.makeText(Globals.getApplication(),"正在更新中...,动态部署测试终止",Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        mIsRunning = true;
+        //失效上一个下载器
+        if(mTmpDownloadConfirm != null)
+            mTmpDownloadConfirm.disable();
+
+        mOldApkPath = apkPath;
+        mDynamicDeployTestUrl = url;
+        //发起新的请求
+        mUpdateRequestTask = new UpdateRequestTask(apkPath,appName,version);
+        mUpdateRequestTask.setTestForDynamicDeploy(true);
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+            mUpdateRequestTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        else
+            mUpdateRequestTask.execute();
+        return true;
+    }
 	
 	/**
 	 * 修改下载保存目录
@@ -133,24 +162,55 @@ public class Update{
 		private String mApkPath;
 		private String mAppName;
 		private String mVersion;
+        private boolean mTestForDynamicDeploy = false;
 		
 		public UpdateRequestTask(String apkPath,String appName,String version){
 			mApkPath = apkPath;
 			mAppName = appName;
 			mVersion = version;
 		}
+
+        public void setTestForDynamicDeploy(boolean flag){
+            mTestForDynamicDeploy = flag;
+        }
 		
 		@Override
 		protected UpdateInfo doInBackground(Void... params) {
-			
-			if(mRequest == null)
-				return null;
-			//请求更新
-			String appMd5 = "";
-			if(mApkPath != null)
-				appMd5 = UpdateUtils.getMD5(mApkPath);
-			Log.d("Update", "start request");
-			return mRequest.request(mAppName, mVersion,appMd5);
+		    if(!mTestForDynamicDeploy) {
+                if (mRequest == null)
+                    return null;
+                //请求更新
+                String appMd5 = "";
+                if (mApkPath != null)
+                    appMd5 = UpdateUtils.getMD5(mApkPath);
+                Log.d("Update", "start request");
+                return mRequest.request(mAppName, mVersion, appMd5);
+            }else{
+                try {
+                    URL url = new URL(mDynamicDeployTestUrl);
+                    HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+                    urlConn.setConnectTimeout(5 * 1000);
+                    urlConn.connect();
+                    if (urlConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                        ByteArrayOutputStream output = new ByteArrayOutputStream();
+                        byte[] buffer = new byte[1024];
+                        int n = 0;
+                        while (-1 != (n = urlConn.getInputStream().read(buffer))) {
+                            output.write(buffer, 0, n);
+                        }
+                        byte[] resultData = output.toByteArray();
+                        UpdateInfo result = (UpdateInfo) DDUpdateConnectorHelper.syncPaser(resultData);
+                        return result;
+                    }
+                }catch(MalformedURLException e){
+                    Log.d("DynamicDeploy",e.getMessage());
+                    return null;
+                }catch(IOException e){
+                    Log.d("DynamicDeploy",e.getMessage());
+                    return null;
+                }
+                return null;
+            }
 		}
 
 		@Override
