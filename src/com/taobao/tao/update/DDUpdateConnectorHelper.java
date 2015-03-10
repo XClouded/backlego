@@ -132,52 +132,8 @@ public class DDUpdateConnectorHelper {
 	        } 
 	        ApiResponse response = new ApiResponse();
 	        UpdateInfo updateInfo = new UpdateInfo();
-	        BundleBaselineInfo baselineInfo= new BundleBaselineInfo();
 			if(response.parseResult(str).success){
-				try {
-				    //json数据解析成功
-					JSONObject jsObj = response.parseResult(str).data;
-					boolean hasUpdate = false;
-					if(jsObj.has("hasAvailableUpdate")){
-						hasUpdate = "true".equals(jsObj.get("hasAvailableUpdate"));
-					}
-                    if (jsObj.has("remindNum")) {
-                        updateInfo.mRemindNum = jsObj.getInt("remindNum");
-                    }
-                    if (jsObj.has("baseVersion")) {
-                        baselineInfo.setmBaselineVersion(jsObj.getString("baseVersion"));
-                    }
-					if(hasUpdate){
-						if(jsObj.has("updateInfo")){
-							jsObj = jsObj.getJSONObject("updateInfo");
-							if(jsObj.has("url"))
-								updateInfo.mApkDLUrl = jsObj.getString("url");
-							if(jsObj.has("patchUrl"))
-								updateInfo.mPatchDLUrl = jsObj.getString("patchUrl");
-							if(jsObj.has("size"))
-								updateInfo.mApkSize = Long.parseLong(jsObj.getString("size"));
-							if(jsObj.has("patchSize"))
-								updateInfo.mPatchSize = Long.parseLong(jsObj.getString("patchSize"));
-							if(jsObj.has("md5"))
-								updateInfo.mNewApkMD5 = jsObj.getString("md5");
-							if(jsObj.has("pri"))
-								updateInfo.mPriority = Integer.parseInt(jsObj.getString("pri"));
-							if(jsObj.has("version"))
-								updateInfo.mVersion = jsObj.getString("version");
-							if(jsObj.has("info"))
-								updateInfo.mNotifyTip = jsObj.getString("info");
-//							updateInfo.mPriority = 2;
-						}else if(jsObj.has("bundleList")){
-						    baselineInfo.setBundleUpdateList(parseBundleUpdate(jsObj.getJSONArray("bundleList"), updateInfo));
-						    updateInfo.setBundleBaselineInfo(baselineInfo);
-                        }else{
-                            updateInfo.mErrCode = SERVICE_ERR;
-                        }
-					}
-				} catch (JSONException e) {
-					updateInfo.mErrCode = SERVICE_ERR;
-					e.printStackTrace();
-				}   
+                parseResponse(response,str,updateInfo);
 			}else{
 				updateInfo.mErrCode = SERVICE_ERR;
 			}
@@ -185,6 +141,55 @@ public class DDUpdateConnectorHelper {
 	        
     	}
 
+    }
+
+    public static void parseResponse(ApiResponse response,String str,UpdateInfo updateInfo){
+
+        try {
+            BundleBaselineInfo baselineInfo= new BundleBaselineInfo();
+            //json数据解析成功
+            JSONObject jsObj = response.parseResult(str).data;
+            boolean hasUpdate = false;
+            if(jsObj.has("hasAvailableUpdate")){
+                hasUpdate = "true".equals(jsObj.get("hasAvailableUpdate"));
+            }
+            if (jsObj.has("remindNum")) {
+                updateInfo.mRemindNum = jsObj.getInt("remindNum");
+            }
+            if (jsObj.has("baseVersion")) {
+                baselineInfo.setmBaselineVersion(jsObj.getString("baseVersion"));
+            }
+            if(hasUpdate){
+                if(jsObj.has("updateInfo")){
+                    jsObj = jsObj.getJSONObject("updateInfo");
+                    if(jsObj.has("url"))
+                        updateInfo.mApkDLUrl = jsObj.getString("url");
+                    if(jsObj.has("patchUrl"))
+                        updateInfo.mPatchDLUrl = jsObj.getString("patchUrl");
+                    if(jsObj.has("size"))
+                        updateInfo.mApkSize = Long.parseLong(jsObj.getString("size"));
+                    if(jsObj.has("patchSize"))
+                        updateInfo.mPatchSize = Long.parseLong(jsObj.getString("patchSize"));
+                    if(jsObj.has("md5"))
+                        updateInfo.mNewApkMD5 = jsObj.getString("md5");
+                    if(jsObj.has("pri"))
+                        updateInfo.mPriority = Integer.parseInt(jsObj.getString("pri"));
+                    if(jsObj.has("version"))
+                        updateInfo.mVersion = jsObj.getString("version");
+                    if(jsObj.has("info"))
+                        updateInfo.mNotifyTip = jsObj.getString("info");
+//							updateInfo.mPriority = 2;
+                }else if(jsObj.has("bundleList")){
+                    baselineInfo.setBundleUpdateList(parseBundleUpdate(jsObj.getJSONArray("bundleList"), updateInfo));
+                    updateInfo.setBundleBaselineInfo(baselineInfo);
+                }else{
+                    updateInfo.mErrCode = SERVICE_ERR;
+                }
+            }
+        } catch (JSONException e) {
+            updateInfo.mErrCode = SERVICE_ERR;
+            e.printStackTrace();
+        }
     }
     
     /**

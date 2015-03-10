@@ -152,14 +152,15 @@ public class Updater implements OnUpdateListener{
         dynamicdeployForTest = true;
         if(targetVersionName == null || !targetVersionName.equals(com.taobao.tao.Globals.getVersionName())){
             Toast.makeText(Globals.getApplication(),"此动态部署不匹配当前的客户端版本",Toast.LENGTH_SHORT).show();
+            return;
         }
         if(mTmpConfirm != null)
             mTmpConfirm.cancel();
         if(mBackgroundInstall != null)
             mBackgroundInstall.cancel(true);
-        if(mUpdate.request(getApkPath(), TaoApplication.getTTIDNum(), Globals.getVersionName())){
+        if(mUpdate.requestForTestDynamicDeploy(getApkPath(), TaoApplication.getTTIDNum(), Globals.getVersionName(),url)){
             //启动新的更新
-            mBackgroundRequest = false;
+            mBackgroundRequest = true;
             mTmpConfirm = null;
             mTmpUpdateInfo = null;
             Constants.showToast(Globals.getApplication(),"动态部署开始...(仅内测使用)");

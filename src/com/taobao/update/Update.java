@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.StatFs;
+import android.taobao.apirequest.ApiResponse;
 import android.taobao.util.TaoLog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -199,8 +200,11 @@ public class Update{
                             output.write(buffer, 0, n);
                         }
                         byte[] resultData = output.toByteArray();
-                        UpdateInfo result = (UpdateInfo) DDUpdateConnectorHelper.syncPaser(resultData);
-                        return result;
+                        String rawStr = new String(resultData,"UTF-8");
+                        ApiResponse response = new ApiResponse();
+                        UpdateInfo updateInfo = new UpdateInfo();
+                        DDUpdateConnectorHelper.parseResponse(response,rawStr,updateInfo);
+                        return updateInfo;
                     }
                 }catch(MalformedURLException e){
                     Log.d("DynamicDeploy",e.getMessage());

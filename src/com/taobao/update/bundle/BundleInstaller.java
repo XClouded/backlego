@@ -1,14 +1,22 @@
 package com.taobao.update.bundle;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.taobao.atlas.framework.Atlas;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.taobao.bspatch.BSPatch;
 import com.taobao.lightapk.BundleInfoManager;
@@ -139,7 +147,30 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
             buildBundleInventory(oldVersion,newVersion,mBaselineInfo);
             if(Updater.dynamicdeployForTest && BundleInstaller.isInstallSuccess()){
                 Toast.makeText(Globals.getApplication(),"动态部署成功,待手淘自动退出后点击手淘启动",Toast.LENGTH_SHORT).show();
-                BundleInstaller.exitApp();
+                WindowManager windowManager = (WindowManager)Globals.getApplication().getSystemService(Context.WINDOW_SERVICE);
+
+                TextView tip = new TextView(Globals.getApplication());
+                tip.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
+                tip.setText("动态部署成功,点击退出客户端并点击淘宝图标重新启动");
+                tip.setClickable(true);
+                tip.setTextColor(Color.BLACK);
+                tip.setBackgroundColor(Color.WHITE);
+                tip.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                    }
+                });
+                WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.TYPE_PHONE,
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                        PixelFormat.TRANSLUCENT);
+
+                params.gravity = Gravity.CENTER;
+
+                windowManager.addView(tip, params);
             }
 	    }
     }
