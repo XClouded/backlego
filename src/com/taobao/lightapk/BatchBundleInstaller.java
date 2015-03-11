@@ -69,7 +69,7 @@ public class BatchBundleInstaller {
                             if(!bundleImpl.getArchive().isDexOpted()){
                                 bundleImpl.optDexFile();
                             }
-                            Atlas.getInstance().enableComponent(info.packageName);
+//                            Atlas.getInstance().enableComponent(info.packageName);
                         }else{
                             return PACKAGE_INSTALL_ERROR;
                         }

@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.taobao.android</groupId>
     <artifactId>update</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <packaging>aar</packaging>
     <name>taobaolego</name>
     <properties>
@@ -109,11 +109,11 @@
             </exclusions>
         </dependency>
 
-        <dependency>
+    <!--     <dependency>
             <groupId>com.taobao.android.hurdle</groupId>
             <artifactId>hurdle_sdk</artifactId>
             <type>aar</type>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>com.taobao.android</groupId>
