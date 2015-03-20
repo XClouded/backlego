@@ -512,7 +512,6 @@ public class BundleInfoManager {
         }
 
         if(!mBatchBundleDownloader.isRunning()) {
-            Resources
             ArrayList<String> pkgs = new ArrayList<String>();
             pkgs.add(mTargetBundleInfo.getPkgName());
             if (mTargetBundleInfo.getDependency() != null) {
