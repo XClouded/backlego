@@ -2,6 +2,7 @@ package com.taobao.lightapk;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StatFs;
@@ -511,6 +512,7 @@ public class BundleInfoManager {
         }
 
         if(!mBatchBundleDownloader.isRunning()) {
+            Resources
             ArrayList<String> pkgs = new ArrayList<String>();
             pkgs.add(mTargetBundleInfo.getPkgName());
             if (mTargetBundleInfo.getDependency() != null) {

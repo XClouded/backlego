@@ -273,9 +273,20 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
     public static boolean isInstallSuccess(){
         return sBundlesInstallSuccess;
     }
-    public static void exitApp(){
+    public static void exitApp(boolean immediately){
         if(sBundlesInstallSuccess){
-            killProcess();
+            if(immediately){
+                UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver","Bundle安装成功，开始杀进程");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                android.os.Process.killProcess(android.os.Process.myPid());
+                UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver","Bundle安装成功，杀进程失败");
+            }else {
+                killProcess();
+            }
         }
     }
     private static void killProcess(){
@@ -283,8 +294,8 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
             AlarmManager am = (AlarmManager)Globals.getApplication().getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(Globals.getApplication(),com.taobao.update.bundle.BundleInstalledExitAppReceiver.class);
             intent.setAction(KILLER_ACTION);
-            long triggerAtTime = SystemClock.elapsedRealtime() + 20*60*1000;  
-            long interval = 20*60*1000; 
+            long triggerAtTime = SystemClock.elapsedRealtime() + 10*60*1000;
+            long interval = 10*60*1000;
             PendingIntent sender = PendingIntent.getBroadcast(Globals.getApplication(), 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
             am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,triggerAtTime,interval,sender);
             Log.d("BundleInstaller", "设置杀掉进程定时器成功,开始触发时间："+triggerAtTime+" 间隔重复时间： "+interval); 

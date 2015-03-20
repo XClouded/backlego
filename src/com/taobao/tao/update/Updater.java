@@ -338,7 +338,7 @@ public class Updater implements OnUpdateListener{
 			apkSize = size(info.mApkSize);
 		
 		
-		if(info.mPriority == 1){
+		if(info.mPriority == 1 && currentActivity.getClass().getName().contains("MainActivity3")){
 			//强制更新
 			mBackgroundDownload = false;
 			mForceDownload = true;

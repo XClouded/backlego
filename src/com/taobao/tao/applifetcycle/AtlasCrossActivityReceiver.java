@@ -55,7 +55,7 @@ public class AtlasCrossActivityReceiver extends BroadcastReceiver{
                    }, 25000);
 //               }
            }else if(value.equals(AppStateBroadcastManager.STOP)){
-               BundleInstaller.exitApp();
+               BundleInstaller.exitApp(false);
 
            }else if(value.equals(AppStateBroadcastManager.EXIT)){
                TaoLog.Logd("AtlasCrossActivityLifeCycleObserver","Application onDestroyed");
@@ -82,6 +82,7 @@ public class AtlasCrossActivityReceiver extends BroadcastReceiver{
                        }
                    }
                }
+               BundleInstaller.exitApp(true);
            }
         }
     }
