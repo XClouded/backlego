@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
+import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
 import com.taobao.tao.update.ui.ForceUpdateNotification;
@@ -271,6 +272,7 @@ public class Updater implements OnUpdateListener{
 			}
 		}else{
 		    if(info.getBundleBaselineInfo() !=null && mBackgroundRequest && !BundleInstaller.isInstallSuccess()){
+                AppMonitor.Counter.commit("dynamicDeploy-5.2.6", "updateReceived", 1);
 		        buildBundleBaselineInfo(info);
 		        File bundleUpdatePath = new File(mContext.getFilesDir().toString(), File.separator +"bundleupdate"+File.separator);
 		        if(!bundleUpdatePath.exists()){

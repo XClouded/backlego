@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.bspatch.BSPatch;
 import com.taobao.lightapk.BundleInfoManager;
 import com.taobao.lightapk.BundleListing;
@@ -127,6 +128,7 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
                 UpdateUserTrack.bundleUpdateTrack("BundleInstaller","Atlas bundle批量安装失败! "+e.getMessage());
             }
             if(isSucess){
+                AppMonitor.Counter.commit("dynamicDeploy-5.2.6", "bundleInstallered", 1);
                 UpdateUserTrack.bundleUpdateTrack("BundleInstaller","Atlas bundle安装成功!!本次bundle更新主版本：" + TaoApplication.getVersion() + "本次bundle更新基线版本："+ mBaselineInfo.getmBaselineVersion());
                 oldVersion = Globals.getVersionName();
                 saveBaselineInfo();

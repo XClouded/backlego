@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.StatFs;
 import android.taobao.atlas.framework.Atlas;
 import android.util.Log;
+import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.tao.util.StringUtil;
 import com.taobao.update.*;
 import org.apache.http.Header;
@@ -476,6 +477,7 @@ public class BundleDownloader implements Downloader{
         @Override
         public void onDownloadFinsh(String apkPath) {
             Log.d("BundleDownloader", "下载成功，开始安装(安装路径："+apkPath+")。。。");
+            AppMonitor.Counter.commit("dynamicDeploy-5.2.6", "bundleDownloaded", 1);
             UpdateUserTrack.bundleUpdateTrack("BundleDownloader","bundle下载成功!");
             BundleInstaller installer = new BundleInstaller(mBaselineInfo,apkPath);
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
