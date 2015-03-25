@@ -453,7 +453,7 @@ public class BundleInfoManager {
         long totalSpace = 0;
         if(statfs != null)
             totalSpace = (long)statfs.getAvailableBlocks()*statfs.getBlockSize();
-        if(totalSpace>200*1024*1024 && getNumCores()>2){
+        if(totalSpace>200*1024*1024 && getNumCores()>=2){
             return true;
         }
         return false;
