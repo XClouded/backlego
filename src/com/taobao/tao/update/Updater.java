@@ -97,7 +97,10 @@ public class Updater implements OnUpdateListener{
 	private BundleDownloader mBundleDownloader = null;
 	
 	private static long sLastCheckTime = 0;
-	
+    public static boolean notifyUserInstallNow = false;
+    private static String sApkPath;
+    private static UpdateInfo sUpdateInfo;
+
 	protected Updater(Application app) {
 		mApp = app;
 		mContext = app.getApplicationContext();
@@ -340,7 +343,7 @@ public class Updater implements OnUpdateListener{
 			apkSize = size(info.mApkSize);
 		
 		
-		if(info.mPriority == 1 && currentActivity.getClass().getName().contains("MainActivity3")){
+		if(info.mPriority == 1){
 			//强制更新
 			mBackgroundDownload = false;
 			mForceDownload = true;
@@ -397,8 +400,15 @@ public class Updater implements OnUpdateListener{
 					mBackgroundInstall.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				else
 					mBackgroundInstall.execute();
-			}else
-				notifyUserInstall(apkPath,mTmpUpdateInfo);
+			}else {
+                if(getCurrentActivity()!=null && getCurrentActivity().getClass().getName().contains("MainActivity3")) {
+                    notifyUserInstall(apkPath, mTmpUpdateInfo);
+                }else{
+                    sApkPath = apkPath;
+                    sUpdateInfo = mTmpUpdateInfo;
+                    notifyUserInstallNow = true;
+                }
+            }
 			
 		}else{
 			//移动网络   提示用户后下载
@@ -725,6 +735,11 @@ public class Updater implements OnUpdateListener{
 			wActivity = null;
 		else
 			wActivity = new WeakReference<Activity>(a);
+
+        if(notifyUserInstallNow && a.getClass().getName().contains("MainActivity3") && sInstance!=null){
+            notifyUserInstallNow = false;
+            sInstance.notifyUserInstall(sApkPath, sUpdateInfo);
+        }
 	}
 	
     public static Activity getCurrentActivity() {
