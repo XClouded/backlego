@@ -13,6 +13,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.taobao.atlas.framework.Atlas;
 import android.taobao.util.NetWork;
@@ -737,8 +739,15 @@ public class Updater implements OnUpdateListener{
 			wActivity = new WeakReference<Activity>(a);
 
         if(notifyUserInstallNow && a.getClass().getName().contains("MainActivity3") && sInstance!=null){
-            notifyUserInstallNow = false;
-            sInstance.notifyUserInstall(sApkPath, sUpdateInfo);
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(sInstance!=null && notifyUserInstallNow && getCurrentActivity()!=null && getCurrentActivity().getClass().getName().contains("MainActivity3")){
+                        notifyUserInstallNow = false;
+                        sInstance.notifyUserInstall(sApkPath, sUpdateInfo);
+                    }
+                }
+            },1000);
         }
 	}
 	
