@@ -47,6 +47,7 @@ public class BundleListing implements IMTOPDataObject{
     public static class BundleInfo {
         private String name;
         private String pkgName;
+		private String applicationName;
         private long size;
         private String version;
         private String desc;
@@ -67,7 +68,15 @@ public class BundleListing implements IMTOPDataObject{
         public void setHost(String host) {
             this.host = host;
         }
+        
+        public String getApplicationName() {
+			return applicationName;
+		}
 
+		public void setApplicationName(String applicationName) {
+			this.applicationName = applicationName;
+		}
+		
         public List<String> getReceivers() {
             return receivers;
         }
