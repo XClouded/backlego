@@ -83,7 +83,7 @@ public class ClassNotFoundInterceptor implements ClassNotFoundInterceptorCallbac
          * 强制走h5
          */
         if(!TextUtils.isEmpty(url)) {
-            if(intent.getComponent()==null || !intent.getComponent().equals("com.taobao.browser.BrowserActivity")){
+            if(intent.getComponent()==null || !intent.getComponent().getClassName().equals("com.taobao.browser.BrowserActivity")){
                 Nav.from(Globals.getApplication()).withCategory("com.taobao.intent.category.HYBRID_UI").withExtras(intent.getExtras()).toUri(intent.getData());
             }else {
                 intent.setComponent(new ComponentName(intent.getComponent().getPackageName(),"com.taobao.android.SimpleBrowserActivity"));
