@@ -86,8 +86,9 @@ public class ClassNotFoundInterceptor implements ClassNotFoundInterceptorCallbac
             if(intent.getComponent()==null || !intent.getComponent().getClassName().equals("com.taobao.browser.BrowserActivity")){
                 Nav.from(Globals.getApplication()).withCategory("com.taobao.intent.category.HYBRID_UI").withExtras(intent.getExtras()).toUri(intent.getData());
             }else {
-                intent.setComponent(new ComponentName(intent.getComponent().getPackageName(),"com.taobao.android.SimpleBrowserActivity"));
-                Nav.from(Globals.getApplication()).withExtras(intent.getExtras()).toUri(intent.getData());
+                intent.setComponent(new ComponentName(intent.getComponent().getPackageName(), "com.taobao.android.SimpleBrowserActivity"));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Globals.getApplication().startActivity(intent);
             }
         }
         return intent;
