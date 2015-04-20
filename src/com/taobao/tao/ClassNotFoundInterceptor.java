@@ -13,6 +13,7 @@ import com.taobao.android.nav.Nav;
 import com.taobao.lightapk.BundleInfoManager;
 import com.taobao.lightapk.BundleListing;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 

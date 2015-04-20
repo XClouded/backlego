@@ -48,7 +48,8 @@ import java.net.URL;
  *
  */
 public class Update{
-	
+
+    public static boolean  DISABLE_PATCH_DOWNLOAD = false;
 	private Downloader mDownloader;
 	private UpdateRequest mRequest;
 	private OnUpdateListener mListener;
@@ -140,6 +141,12 @@ public class Update{
         else
             mUpdateRequestTask.execute();
         return true;
+    }
+
+    public void retry(){
+        if(mTmpDownloadConfirm!=null){
+            mTmpDownloadConfirm.download();
+        }
     }
 	
 	/**
@@ -378,7 +385,7 @@ public class Update{
 			if(statfs != null)
 				totalSpace = (long)statfs.getAvailableBlocks()*statfs.getBlockSize();
 			totalSpace -= mUpdateInfo.mApkSize + FOR_ENOUGH_SPACE;
-			if(mUpdateInfo.mPatchDLUrl == null || mUpdateInfo.mPatchDLUrl.length() == 0){
+			if(DISABLE_PATCH_DOWNLOAD || mUpdateInfo.mPatchDLUrl == null || mUpdateInfo.mPatchDLUrl.length() == 0){
 				if(totalSpace >= 0){
 					Log.d("Update", "start download");
 					mDownloader.download(mUpdateInfo.mApkDLUrl, mApkStorePath, mUpdateInfo.mApkSize);
@@ -509,6 +516,7 @@ public class Update{
 					mListener.onDownloadFinsh(mTmpNewApkFile);
 			}else{
 				//合并失败
+                DISABLE_PATCH_DOWNLOAD = true;
 				if(mListener != null)
 					mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
 			}

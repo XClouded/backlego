@@ -538,6 +538,7 @@ public class Updater implements OnUpdateListener{
 			msg = mContext.getResources().getString(R.string.notice_update_err_md5);
 			// fixed bug by leinuo md5失败无法重新下载安装
             clearUpdatePath(mUpdateDir);
+            mUpdate.retry();
 			break;
 		case OnDownloaderListener.ERROR_NOT_ENOUGH_SPACE:
 			msg = mContext.getResources().getString(R.string.notice_undercapacity);
