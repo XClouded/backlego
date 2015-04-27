@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.taobao.bspatch.BSPatch;
 import com.taobao.tao.Globals;
 import com.taobao.tao.update.DDUpdateConnectorHelper;
+import com.taobao.tao.update.Updater;
 import com.taobao.update.Downloader.OnDownloaderListener;
 
 import java.io.ByteArrayOutputStream;
@@ -49,7 +50,6 @@ import java.net.URL;
  */
 public class Update{
 
-    public static boolean  DISABLE_PATCH_DOWNLOAD = false;
 	private Downloader mDownloader;
 	private UpdateRequest mRequest;
 	private OnUpdateListener mListener;
@@ -61,6 +61,7 @@ public class Update{
 	private DownloadConfirm mTmpDownloadConfirm;
 	private final int FOR_ENOUGH_SPACE = 2*1024*1024;
     private String mDynamicDeployTestUrl = null;
+    private boolean canRetry = false;
 	
 	/**
 	 * 更新初始化
@@ -385,17 +386,21 @@ public class Update{
 			if(statfs != null)
 				totalSpace = (long)statfs.getAvailableBlocks()*statfs.getBlockSize();
 			totalSpace -= mUpdateInfo.mApkSize + FOR_ENOUGH_SPACE;
-			if(DISABLE_PATCH_DOWNLOAD || mUpdateInfo.mPatchDLUrl == null || mUpdateInfo.mPatchDLUrl.length() == 0){
+			if(canRetry || mUpdateInfo.mPatchDLUrl == null || mUpdateInfo.mPatchDLUrl.length() == 0){
+                canRetry = false;
 				if(totalSpace >= 0){
 					Log.d("Update", "start download");
 					mDownloader.download(mUpdateInfo.mApkDLUrl, mApkStorePath, mUpdateInfo.mApkSize);
-				}
+                    Updater.logUpdateState(mUpdateInfo.mVersion,Updater.STEP_REQUEST, Updater.MODE_ENTIRE);
+
+                }
 			}else{
 				//存储空间是否足够
 				totalSpace -= mUpdateInfo.mPatchSize;
 				if(totalSpace >= 0){
 					Log.d("Update", "start download");
-					mDownloader.download(mUpdateInfo.mPatchDLUrl, mApkStorePath, mUpdateInfo.mPatchSize);
+                    Updater.logUpdateState(mUpdateInfo.mVersion,Updater.STEP_REQUEST,Updater.MODE_PATCH);
+                    mDownloader.download(mUpdateInfo.mPatchDLUrl, mApkStorePath, mUpdateInfo.mPatchSize);
 				}
 			}
 			
@@ -455,12 +460,14 @@ public class Update{
                         mIsRunning = false;
                         return ;
                     }
+                    Updater.logUpdateState(mUpdateInfo.mVersion,Updater.STEP_DOWNLOAD,Updater.MODE_ENTIRE);
                     //apk下载完成则通知
                     if(mListener != null)
                         mListener.onDownloadFinsh(apkPath);
                     mIsRunning = false;
 				}else{
-					if(mUpdateInfo != null){
+                    Updater.logUpdateState(mUpdateInfo.mVersion,Updater.STEP_DOWNLOAD,Updater.MODE_PATCH);
+                    if(mUpdateInfo != null){
 						//合并差量包
 						URL url = null;
 						try {
@@ -491,6 +498,10 @@ public class Update{
 			}
 		}
 	}
+
+    public boolean canRetry(){
+        return canRetry;
+    }
 	
 	class PatchTask extends  AsyncTask<String,Void,Boolean>{
 		
@@ -510,17 +521,21 @@ public class Update{
 		@Override
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
-			if(result){
-				//合并成功
-				if(mListener != null)
-					mListener.onDownloadFinsh(mTmpNewApkFile);
-			}else{
-				//合并失败
-                DISABLE_PATCH_DOWNLOAD = true;
-				if(mListener != null)
-					mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
-			}
-			mIsRunning = false;
+            canRetry = true;
+            if(mListener != null)
+                mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
+//			if(result){
+//				//合并成功
+//                Updater.sPatchInstall = true;
+//				if(mListener != null)
+//					mListener.onDownloadFinsh(mTmpNewApkFile);
+//			}else{
+//				//合并失败
+//                canRetry = true;
+//				if(mListener != null)
+//					mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
+//			}
+//			mIsRunning = false;
 		}
 
 		@Override

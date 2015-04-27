@@ -50,6 +50,11 @@ public class UpdateInfo {
      * 版本提醒次数，默认1次
      */
     public int    mRemindNum  = 1;
+
+    /**
+     * 动态部署回滚版本
+     */
+    public String rollback = null;
     
     /**
      * bundle更新基线信息

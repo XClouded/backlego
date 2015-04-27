@@ -24,8 +24,10 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 import com.alibaba.mtl.appmonitor.AppMonitor;
+import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListRequest;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
+import com.taobao.tao.update.business.MtopTaobaoClientAppUpdateTrackRequest;
 import com.taobao.tao.update.ui.ForceUpdateNotification;
 import com.taobao.tao.update.ui.UpdateNotification;
 import com.taobao.tao.util.ConfigReader;
@@ -40,6 +42,9 @@ import com.taobao.update.bundle.BundleBaselineInfo;
 import com.taobao.update.bundle.BundleDownloader;
 import com.taobao.update.bundle.BundleInstaller;
 import com.taobao.update.bundle.BundleUpdateInfo;
+import mtopsdk.mtop.domain.MethodEnum;
+import mtopsdk.mtop.domain.MtopResponse;
+import mtopsdk.mtop.intf.Mtop;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -102,6 +107,7 @@ public class Updater implements OnUpdateListener{
     public static boolean notifyUserInstallNow = false;
     private static String sApkPath;
     private static UpdateInfo sUpdateInfo;
+    public static boolean sPatchInstall = false;
 
 	protected Updater(Application app) {
 		mApp = app;
@@ -256,6 +262,7 @@ public class Updater implements OnUpdateListener{
 	@Override
 	public void onRequestResult(UpdateInfo info,
 			DownloadConfirm confirm) {
+        sPatchInstall = false;
 		if(info == null){
 			//无更新
 			TaoLog.Logd("Updater", "no update");
@@ -286,6 +293,10 @@ public class Updater implements OnUpdateListener{
 		        mBundleDownloader.download(info, bundleUpdatePath.getAbsolutePath(), info.getBundleBaselineInfo().getAllSize());
 		        return ;
 		    }
+            if(!TextUtils.isEmpty(info.rollback)){
+                rollback(info.rollback);
+                return;
+            }
 		    if((info.mApkDLUrl == null || info.mApkDLUrl.length() == 0)
                     && (info.mPatchDLUrl == null || info.mPatchDLUrl.length() == 0)){
 		        //无更新
@@ -538,7 +549,9 @@ public class Updater implements OnUpdateListener{
 			msg = mContext.getResources().getString(R.string.notice_update_err_md5);
 			// fixed bug by leinuo md5失败无法重新下载安装
             clearUpdatePath(mUpdateDir);
-            mUpdate.retry();
+            if(mUpdate.canRetry()) {
+                mUpdate.retry();
+            }
 			break;
 		case OnDownloaderListener.ERROR_NOT_ENOUGH_SPACE:
 			msg = mContext.getResources().getString(R.string.notice_undercapacity);
@@ -642,6 +655,7 @@ public class Updater implements OnUpdateListener{
 					sAtlasDDSuccess = true;
 				}
 			}else{
+                Updater.logUpdateState(mTmpUpdateInfo.mVersion,Updater.STEP_INSTALL,sPatchInstall ? MODE_PATCH:MODE_ENTIRE);
 				TaoLog.Logd("Updater", "system install ");
 				Intent installIntent = new Intent(Intent.ACTION_VIEW);
 				installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -700,7 +714,8 @@ public class Updater implements OnUpdateListener{
 				case FORCE_INSTALL:{
 					//强制更新安装
 					TaoLog.Logd("Updater", "force update install");
-					String apkFile = intent.getStringExtra(INSTALL_PATH);
+                    Updater.logUpdateState(mTmpUpdateInfo.mVersion,Updater.STEP_INSTALL,sPatchInstall ? MODE_PATCH:MODE_ENTIRE);
+                    String apkFile = intent.getStringExtra(INSTALL_PATH);
 					Intent installIntent = new Intent(Intent.ACTION_VIEW);
 					installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					installIntent.setDataAndType(Uri.fromFile(new File(apkFile)),
@@ -907,4 +922,30 @@ public class Updater implements OnUpdateListener{
         }
     }
 
+    public static int MODE_ENTIRE = 1;
+    public static int MODE_PATCH   = 2;
+
+    public static int STEP_REQUEST = 1;
+    public static int STEP_DOWNLOAD= 3;
+    public static int STEP_INSTALL = 5;
+    public static int STEP_FINISH  = 7;
+
+    public static void logUpdateState(String newVersion,int updateStep, int updateMode){
+        MtopTaobaoClientAppUpdateTrackRequest request = new MtopTaobaoClientAppUpdateTrackRequest();
+        request.setAppGroup("");
+        request.setCurVersion(TaoApplication.getVersion());
+        request.setNewVersion(newVersion);
+        request.setUpdateStep(updateStep);
+        request.setUpdateModel(updateMode);
+        Mtop.instance(Globals.getApplication()).build(request, TaoHelper.getTTID()).reqMethod(MethodEnum.POST).asyncRequest();
+    }
+
+    private void rollback(String rollbackVersion)
+    {
+        if(TextUtils.isEmpty(rollbackVersion)){
+            return;
+        }
+        BundleInstaller installer  = new BundleInstaller();
+        installer.rollback(rollbackVersion);
+    }
 }

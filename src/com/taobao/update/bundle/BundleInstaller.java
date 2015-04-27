@@ -6,11 +6,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.taobao.atlas.framework.Atlas;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -22,6 +24,7 @@ import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.bspatch.BSPatch;
 import com.taobao.lightapk.BundleInfoManager;
 import com.taobao.lightapk.BundleListing;
+import com.taobao.tao.BaselineInfoProvider;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
 import com.taobao.tao.update.Updater;
@@ -58,6 +61,8 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
         this.packageInstall = mBaselineInfo.getPackageMD5();
         this.patchInstall = mBaselineInfo.getPatchMD5();
     }
+
+    public BundleInstaller(){}
     
     @Override
     protected void onPreExecute() {
@@ -229,6 +234,55 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
             }
             updatePath.delete();
         }
+    }
+
+    public void rollback(String baseLineVersion){
+        if(TextUtils.isEmpty(baseLineVersion)){
+            return;
+        }
+        String lastMainVersion = BaselineInfoProvider.getInstance().getMainVersionName();
+        if(!TextUtils.isEmpty(lastMainVersion)){
+            List<String> bundles = BaselineInfoProvider.getInstance().getLastDynamicDeployBunldes();
+            if(baseLineVersion.equals(lastMainVersion) && bundles.size()>0){
+                //回滚到上个版本
+                if(!Atlas.getInstance().restoreBundle(bundles.toArray(new String[bundles.size()]))){
+                    Atlas.getInstance().clearBundlesStorage();
+                    String path = Globals.getApplication().getFilesDir().getAbsolutePath()+File.separatorChar+"bundleBaseline"+File.separatorChar;
+                    File baseinfoFile = new File(path);
+                    if(!baseinfoFile.exists()){
+                        baseinfoFile.delete();
+                    }
+                    return;
+                }
+                String path = Globals.getApplication().getFilesDir().getAbsolutePath()+File.separatorChar+"bundleBaseline"+File.separatorChar;
+                File baseinfoFile = new File(path);
+                if(!baseinfoFile.exists()){
+                    baseinfoFile.mkdir();
+                }
+                try {
+                    DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(baseinfoFile.getAbsolutePath(), "baselineInfo"))));
+                    out.writeUTF(baseLineVersion);
+                    out.writeInt(getVersionCode());
+                    out.writeUTF(baseLineVersion);
+                    out.writeUTF("");
+                    out.flush();
+                    out.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                //回滚到安装时期
+                Atlas.getInstance().clearBundlesStorage();
+                String path = Globals.getApplication().getFilesDir().getAbsolutePath()+File.separatorChar+"bundleBaseline"+File.separatorChar;
+                File baseinfoFile = new File(path);
+                if(!baseinfoFile.exists()){
+                    baseinfoFile.delete();
+                }
+            }
+        }
+
     }
     
     private void saveBaselineInfo(){

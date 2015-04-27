@@ -153,6 +153,9 @@ public class DDUpdateConnectorHelper {
             if(jsObj.has("hasAvailableUpdate")){
                 hasUpdate = "true".equals(jsObj.get("hasAvailableUpdate"));
             }
+            if(jsObj.has("rollback")){
+                updateInfo.rollback = jsObj.getString("rollback");
+            }
             if (jsObj.has("remindNum")) {
                 updateInfo.mRemindNum = jsObj.getInt("remindNum");
             }
