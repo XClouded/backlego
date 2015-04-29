@@ -174,7 +174,7 @@ public class Updater implements OnUpdateListener{
             //启动新的更新
             mBackgroundRequest = true;
             mTmpConfirm = null;
-            mTmpUpdateInfo = null;
+//            mTmpUpdateInfo = null;
             Constants.showToast(Globals.getApplication(),"动态部署开始...(仅内测使用)");
         }else{
             Constants.showToast(Globals.getApplication(),"当前正在更新中");
@@ -550,7 +550,7 @@ public class Updater implements OnUpdateListener{
 			// fixed bug by leinuo md5失败无法重新下载安装
             clearUpdatePath(mUpdateDir);
             if(mUpdate.canRetry()) {
-                mUpdate.retry();
+                 mUpdate.retry();
             }
 			break;
 		case OnDownloaderListener.ERROR_NOT_ENOUGH_SPACE:
@@ -655,7 +655,8 @@ public class Updater implements OnUpdateListener{
 					sAtlasDDSuccess = true;
 				}
 			}else{
-                Updater.logUpdateState(mTmpUpdateInfo.mVersion,Updater.STEP_INSTALL,sPatchInstall ? MODE_PATCH:MODE_ENTIRE);
+                if(mTmpUpdateInfo!=null)
+                    Updater.logUpdateState(mTmpUpdateInfo.mVersion,Updater.STEP_INSTALL,sPatchInstall ? MODE_PATCH:MODE_ENTIRE);
 				TaoLog.Logd("Updater", "system install ");
 				Intent installIntent = new Intent(Intent.ACTION_VIEW);
 				installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -714,7 +715,8 @@ public class Updater implements OnUpdateListener{
 				case FORCE_INSTALL:{
 					//强制更新安装
 					TaoLog.Logd("Updater", "force update install");
-                    Updater.logUpdateState(mTmpUpdateInfo.mVersion,Updater.STEP_INSTALL,sPatchInstall ? MODE_PATCH:MODE_ENTIRE);
+                    if(mTmpUpdateInfo!=null)
+                        Updater.logUpdateState(mTmpUpdateInfo.mVersion,Updater.STEP_INSTALL,sPatchInstall ? MODE_PATCH:MODE_ENTIRE);
                     String apkFile = intent.getStringExtra(INSTALL_PATH);
 					Intent installIntent = new Intent(Intent.ACTION_VIEW);
 					installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -947,5 +949,13 @@ public class Updater implements OnUpdateListener{
         }
         BundleInstaller installer  = new BundleInstaller();
         installer.rollback(rollbackVersion);
+    }
+
+    public static boolean needRollback(){
+        return BundleInstaller.needRollback();
+    }
+
+    public static void removeBaseLineInfo(){
+        BundleInstaller.removeBaseLineInfo();
     }
 }

@@ -51,6 +51,7 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
     private boolean mPreCheck = false;
     private List<File> preparedInstallBundle = new ArrayList<File>();
     private static boolean sBundlesInstallSuccess = false;
+    private static boolean sBundlesRevertSuccess = false;
     private static final String KILLER_ACTION = "com.taobao.update.bundle.action.BUNDLEINSTALLED_EXIT_APP";
     private String oldVersion;
         
@@ -236,51 +237,97 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
         }
     }
 
+    public static boolean needRollback(){
+        File baseLineDir = new File(Globals.getApplication().getFilesDir().getAbsolutePath() + File.separatorChar + "bundleBaseline");
+        if(baseLineDir.exists()){
+            File deprecated = new File(baseLineDir, "deprecated_mark");
+            if(deprecated.exists()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void removeBaseLineInfo(){
+        try {
+            File file = new File(Globals.getApplication().getFilesDir() + File.separator + "bundleBaseline");
+            File[] baseLineFiles = file.listFiles();
+            if (baseLineFiles != null) {
+                for (File baseLineFile : baseLineFiles) {
+                    baseLineFile.delete();
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
     public void rollback(String baseLineVersion){
         if(TextUtils.isEmpty(baseLineVersion)){
             return;
         }
-        String lastMainVersion = BaselineInfoProvider.getInstance().getMainVersionName();
-        if(!TextUtils.isEmpty(lastMainVersion)){
-            List<String> bundles = BaselineInfoProvider.getInstance().getLastDynamicDeployBunldes();
-            if(baseLineVersion.equals(lastMainVersion) && bundles.size()>0){
-                //回滚到上个版本
-                if(!Atlas.getInstance().restoreBundle(bundles.toArray(new String[bundles.size()]))){
-                    Atlas.getInstance().clearBundlesStorage();
-                    String path = Globals.getApplication().getFilesDir().getAbsolutePath()+File.separatorChar+"bundleBaseline"+File.separatorChar;
-                    File baseinfoFile = new File(path);
-                    if(!baseinfoFile.exists()){
-                        baseinfoFile.delete();
-                    }
-                    return;
+        if(!baseLineVersion.equals(TaoApplication.getVersion())){
+            try {
+                File baseLineDir = new File(Globals.getApplication().getFilesDir().getAbsolutePath() + File.separatorChar + "bundleBaseline");
+                if (!baseLineDir.exists()) {
+                    baseLineDir.mkdirs();
                 }
-                String path = Globals.getApplication().getFilesDir().getAbsolutePath()+File.separatorChar+"bundleBaseline"+File.separatorChar;
-                File baseinfoFile = new File(path);
-                if(!baseinfoFile.exists()){
-                    baseinfoFile.mkdir();
+                File deprecated = new File(baseLineDir, "deprecated_mark");
+                if(!deprecated.exists()) {
+                    deprecated.createNewFile();
                 }
-                try {
-                    DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(baseinfoFile.getAbsolutePath(), "baselineInfo"))));
-                    out.writeUTF(baseLineVersion);
-                    out.writeInt(getVersionCode());
-                    out.writeUTF(baseLineVersion);
-                    out.writeUTF("");
-                    out.flush();
-                    out.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                String baseLineInfoPath = Globals.getApplication().getFilesDir()+File.separator+"bundleBaseline"+File.separator+"baselineInfo";
+                File file = new File(baseLineInfoPath);
+                if(file.exists()){
+                    file.delete();
                 }
-            }else{
-                //回滚到安装时期
-                Atlas.getInstance().clearBundlesStorage();
-                String path = Globals.getApplication().getFilesDir().getAbsolutePath()+File.separatorChar+"bundleBaseline"+File.separatorChar;
-                File baseinfoFile = new File(path);
-                if(!baseinfoFile.exists()){
-                    baseinfoFile.delete();
-                }
+            }catch(Exception e){
+                e.printStackTrace();
             }
+//        String lastMainVersion = BaselineInfoProvider.getInstance().getMainVersionName();
+//        if(!TextUtils.isEmpty(lastMainVersion)){
+//            List<String> bundles = BaselineInfoProvider.getInstance().getLastDynamicDeployBunldes();
+//            if(baseLineVersion.equals(lastMainVersion) && bundles.size()>0){
+//                //回滚到上个版本
+//                if(!Atlas.getInstance().restoreBundle(bundles.toArray(new String[bundles.size()]))){
+//                    sdfsdfsdfsf
+//                    String path = Globals.getApplication().getFilesDir().getAbsolutePath()+File.separatorChar+"bundleBaseline"+File.separatorChar;
+//                    File baseinfoFile = new File(path);
+//                    if(!baseinfoFile.exists()){
+//                        baseinfoFile.delete();
+//                    }
+//                    return;
+//                }
+//                String path = Globals.getApplication().getFilesDir().getAbsolutePath()+File.separatorChar+"bundleBaseline"+File.separatorChar;
+//                File baseinfoFile = new File(path);
+//                if(!baseinfoFile.exists()){
+//                    baseinfoFile.mkdir();
+//                }
+//                try {
+//                    DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(baseinfoFile.getAbsolutePath(), "baselineInfo"))));
+//                    out.writeUTF(baseLineVersion);
+//                    out.writeInt(getVersionCode());
+//                    out.writeUTF(baseLineVersion);
+//                    out.writeUTF("");
+//                    out.flush();
+//                    out.close();
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                sBundlesRevertSuccess = true;
+//            }else{
+//                //回滚到安装时期
+//                dfsdfsdf
+//                sBundlesRevertSuccess = true;
+//                String path = Globals.getApplication().getFilesDir().getAbsolutePath()+File.separatorChar+"bundleBaseline"+File.separatorChar;
+//                File baseinfoFile = new File(path);
+//                if(!baseinfoFile.exists()){
+//                    baseinfoFile.delete();
+//                }
+//            }
         }
 
     }
