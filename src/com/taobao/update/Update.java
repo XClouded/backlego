@@ -521,21 +521,21 @@ public class Update{
 		@Override
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
-            canRetry = true;
-            if(mListener != null)
-                mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
-//			if(result){
-//				//合并成功
-//                Updater.sPatchInstall = true;
-//				if(mListener != null)
-//					mListener.onDownloadFinsh(mTmpNewApkFile);
-//			}else{
-//				//合并失败
-//                canRetry = true;
-//				if(mListener != null)
-//					mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
-//			}
-//			mIsRunning = false;
+//            canRetry = true;
+//            if(mListener != null)
+//                mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
+			if(result){
+				//合并成功
+                Updater.sPatchInstall = true;
+				if(mListener != null)
+					mListener.onDownloadFinsh(mTmpNewApkFile);
+			}else{
+				//合并失败
+                canRetry = true;
+				if(mListener != null)
+					mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
+			}
+			mIsRunning = false;
 		}
 
 		@Override

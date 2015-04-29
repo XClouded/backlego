@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.taobao.android</groupId>
     <artifactId>update</artifactId>
-    <version>1.1.7-SNAPSHOT</version>
+    <version>1.1.8</version>
     <packaging>aar</packaging>
     <name>taobaolego</name>
     <properties>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>atlas</artifactId>
-            <version>2.3.20-SNAPSHOT</version>
+            <version>2.3.266-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.taobao.android</groupId>
@@ -131,7 +131,7 @@
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>taobaocompat</artifactId>
-            <version>2.7.3</version>
+            <version>2.10.0.255-SNAPSHOT</version>
             <type>aar</type>
             <scope>provided</scope>
         </dependency>
