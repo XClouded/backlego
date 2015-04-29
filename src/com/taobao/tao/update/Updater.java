@@ -935,13 +935,17 @@ public class Updater implements OnUpdateListener{
     public static int STEP_FINISH  = 7;
 
     public static void logUpdateState(String newVersion,int updateStep, int updateMode){
-        MtopTaobaoClientAppUpdateTrackRequest request = new MtopTaobaoClientAppUpdateTrackRequest();
-        request.setAppGroup("");
-        request.setCurVersion(TaoApplication.getVersion());
-        request.setNewVersion(newVersion);
-        request.setUpdateStep(updateStep);
-        request.setUpdateModel(updateMode);
-        Mtop.instance(Globals.getApplication()).build(request, TaoHelper.getTTID()).reqMethod(MethodEnum.POST).asyncRequest();
+        try {
+            MtopTaobaoClientAppUpdateTrackRequest request = new MtopTaobaoClientAppUpdateTrackRequest();
+            request.setAppGroup("taobao4android");
+            request.setCurVersion(TaoApplication.getVersion());
+            request.setNewVersion(newVersion);
+            request.setUpdateStep(updateStep);
+            request.setUpdateModel(updateMode);
+            Mtop.instance(Globals.getApplication()).build(request, TaoHelper.getTTID()).reqMethod(MethodEnum.POST).asyncRequest();
+        }catch(Throwable e){
+            e.printStackTrace();
+        }
     }
 
     private void rollback(String rollbackVersion)
