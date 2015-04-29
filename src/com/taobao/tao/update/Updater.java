@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -228,7 +229,7 @@ public class Updater implements OnUpdateListener{
 			//启动新的更新
 			mBackgroundRequest = background;
 			mTmpConfirm = null;
-			mTmpUpdateInfo = null;
+//			mTmpUpdateInfo = null;
 		}else{
 			//更新已经启动
 			if(!mBackgroundRequest){
@@ -438,23 +439,23 @@ public class Updater implements OnUpdateListener{
 
 	//提示用户安装
 	private void notifyUserInstall(String apkPath,UpdateInfo updateInfo){
-		if (mTmpUpdateInfo.mPriority == 1){
+		if (updateInfo.mPriority == 1){
 			//强制更新dialog
-			mForceNotification.finished(apkPath,mTmpUpdateInfo.mNotifyTip);
+			mForceNotification.finished(apkPath,updateInfo.mNotifyTip);
 		}else{
 			//普通更新dialog
 			final Activity currentActivity = getCurrentActivity();
 			if (currentActivity == null) {
 				return;
 			}
-            int notifyTimes = NotificationRecordStorage.get(mTmpUpdateInfo.mVersion);
+            int notifyTimes = NotificationRecordStorage.get(updateInfo.mVersion);
             // 服务器设置的提醒次数大于0，提示次数有剩余 而且是后台更新
-            if ((mTmpUpdateInfo.mRemindNum <= 0 || notifyTimes >= mTmpUpdateInfo.mRemindNum) && mBackgroundRequest) {
+            if ((updateInfo.mRemindNum <= 0 || notifyTimes >= updateInfo.mRemindNum) && mBackgroundRequest) {
 				//更新结束   销毁
 				release();
 				return;
 			}
-            mNotification.popUpInstallDlg(apkPath, mTmpUpdateInfo.mNotifyTip);
+            mNotification.popUpInstallDlg(apkPath, updateInfo.mNotifyTip);
             if (mBackgroundRequest) {
                 NotificationRecordStorage.update(updateInfo.mVersion, updateInfo.mRemindNum);
             }
@@ -551,6 +552,7 @@ public class Updater implements OnUpdateListener{
             clearUpdatePath(mUpdateDir);
             if(mUpdate.canRetry()) {
                  mUpdate.retry();
+                return;
             }
 			break;
 		case OnDownloaderListener.ERROR_NOT_ENOUGH_SPACE:
