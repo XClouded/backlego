@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -285,7 +286,7 @@ public class Updater implements OnUpdateListener{
 			}
 		}else{
 		    if(info.getBundleBaselineInfo() !=null && mBackgroundRequest && !BundleInstaller.isInstallSuccess()){
-                AppMonitor.Counter.commit("dynamicDeploy-5.2.6", "updateReceived", 1);
+                AppMonitor.Counter.commit("dynamicDeploy", "updateReceived",info.getBundleBaselineInfo().getmBaselineVersion(), 1);
 		        buildBundleBaselineInfo(info);
 		        File bundleUpdatePath = new File(mContext.getFilesDir().toString(), File.separator +"bundleupdate"+File.separator);
 		        if(!bundleUpdatePath.exists()){
