@@ -151,16 +151,6 @@ public class BundleInfoManager {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                File file =new File(LIST_FILE_DIR);
-                if(file.exists() && file.isDirectory()){
-                    File[] files = file.listFiles();
-                    for(File item : files){
-                        if(item.getName()!=null && !item.getName().equals(fileName)){
-                            item.delete();
-                        }
-                    }
-
-                }
                 return "";
             }
         }.execute();
@@ -256,13 +246,21 @@ public class BundleInfoManager {
      * 删除老的清单
      * @param mainVersion
      */
-    public void removeBundleListingByVersion(String mainVersion){
-        Log.d(TAG,"remove bundle version= "+mainVersion);
-        String fileName = String.format("%s%s.json",BUNDLE_LIST_FILE_PREFIX,mainVersion);
-        String filePath = String.format("%s%s",LIST_FILE_DIR,fileName);
-        File file = new File(filePath);
-        if(file.exists()){
-            file.delete();
+    public void removeBundleListing(){
+//        Log.d(TAG,"remove bundle version= "+mainVersion);
+//        String fileName = String.format("%s%s.json",BUNDLE_LIST_FILE_PREFIX,mainVersion);
+//        String filePath = String.format("%s%s",LIST_FILE_DIR,fileName);
+//        File file = new File(filePath);
+//        if(file.exists()){
+//            file.delete();
+//        }
+        File file =new File(LIST_FILE_DIR);
+        if(file.exists() && file.isDirectory()){
+            File[] files = file.listFiles();
+            for(File item : files){
+                item.delete();
+            }
+
         }
     }
 

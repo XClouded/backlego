@@ -28,6 +28,7 @@ import com.taobao.tao.BaselineInfoProvider;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
 import com.taobao.tao.update.Updater;
+import com.taobao.tao.util.ActivityHelper;
 import com.taobao.update.UpdateUserTrack;
 import com.taobao.update.UpdateUtils;
 
@@ -257,6 +258,7 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
                     baseLineFile.delete();
                 }
             }
+            BundleInfoManager.instance().removeBundleListing();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -278,6 +280,7 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
             if(file.exists()){
                 file.delete();
             }
+            sBundlesRevertSuccess = true;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -370,16 +373,12 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
         return sBundlesInstallSuccess;
     }
     public static void exitApp(boolean immediately){
-        if(sBundlesInstallSuccess){
+        if(sBundlesInstallSuccess || sBundlesRevertSuccess){
             if(immediately){
                 UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver","Bundle安装成功，开始杀进程");
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 android.os.Process.killProcess(android.os.Process.myPid());
-                UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver","Bundle安装成功，杀进程失败");
+                ActivityHelper.kill();
+//                UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver","Bundle安装成功，杀进程失败");
             }else {
                 killProcess();
             }

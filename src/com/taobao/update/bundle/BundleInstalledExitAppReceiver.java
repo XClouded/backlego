@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.util.Log;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
+import com.taobao.tao.util.ActivityHelper;
 import com.taobao.update.UpdateUserTrack;
 
 public class BundleInstalledExitAppReceiver extends BroadcastReceiver {
@@ -32,6 +33,7 @@ public class BundleInstalledExitAppReceiver extends BroadcastReceiver {
                         e.printStackTrace();
                     }
                     android.os.Process.killProcess(android.os.Process.myPid());
+                    ActivityHelper.kill();
                     UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver","Bundle安装成功，杀进程失败");
                 }
             } 
