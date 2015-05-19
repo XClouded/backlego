@@ -143,6 +143,16 @@ public class DDUpdateConnectorHelper {
 
     }
 
+    public static String buildUrl(String rawUrl){
+        if(TextUtils.isEmpty(rawUrl)){
+            return rawUrl;
+        }
+        if(!rawUrl.startsWith("http:")){
+            rawUrl = String.format("%s%s","http:",rawUrl);
+        }
+        return rawUrl;
+    }
+
     public static void parseResponse(ApiResponse response,String str,UpdateInfo updateInfo){
 
         try {
@@ -166,9 +176,9 @@ public class DDUpdateConnectorHelper {
                 if(jsObj.has("updateInfo")){
                     jsObj = jsObj.getJSONObject("updateInfo");
                     if(jsObj.has("url"))
-                        updateInfo.mApkDLUrl = jsObj.getString("url");
+                        updateInfo.mApkDLUrl = buildUrl(jsObj.getString("url"));
                     if(jsObj.has("patchUrl"))
-                        updateInfo.mPatchDLUrl = jsObj.getString("patchUrl");
+                        updateInfo.mPatchDLUrl = buildUrl(jsObj.getString("patchUrl"));
                     if(jsObj.has("size"))
                         updateInfo.mApkSize = Long.parseLong(jsObj.getString("size"));
                     if(jsObj.has("patchSize"))
@@ -225,7 +235,7 @@ public class DDUpdateConnectorHelper {
                         }
                     }
                     if(jsObj.has("packageUrl")){
-                        bundleUpdateInfo.mBundleDLUrl = jsObj.getString("packageUrl");
+                        bundleUpdateInfo.mBundleDLUrl = buildUrl(jsObj.getString("packageUrl"));
                     }
                     if(jsObj.has("version")){
                         bundleUpdateInfo.mVersion = jsObj.getString("version");
@@ -240,7 +250,7 @@ public class DDUpdateConnectorHelper {
                         bundleUpdateInfo.mlocalBundleMD5 = jsObj.getString("pastMd5");
                     }
                     if(jsObj.has("patchUrl")){
-                        bundleUpdateInfo.mPatchDLUrl = jsObj.getString("patchUrl");
+                        bundleUpdateInfo.mPatchDLUrl = buildUrl(jsObj.getString("patchUrl"));
                     }
                     if(jsObj.has("patchSize")){
                         bundleUpdateInfo.mPatchSize = Long.parseLong(jsObj.getString("patchSize"));
