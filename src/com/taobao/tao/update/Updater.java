@@ -896,6 +896,7 @@ public class Updater implements OnUpdateListener{
             url = new URL(mTmpUpdateInfo.mApkDLUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            return "MalFormedURLException "+ url;
         }
         String fileName = new File(url.getFile()).getName();
         File apk = new File(mUpdateDir, fileName);
