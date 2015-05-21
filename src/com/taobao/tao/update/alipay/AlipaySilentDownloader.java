@@ -105,19 +105,20 @@ public class AlipaySilentDownloader implements OnUpdateListener {
                         Log.d(TAG,"start check");
                     }
                 }
-            }else if(!NOT_UPDATE){
-                String lastRequestTime = AppPreference.getString("last_request_alipay_time","0");
-                if(System.currentTimeMillis()-Long.parseLong(lastRequestTime)<24*3600*1000){
-                    return;
-                }
-                if (canDownload()) {
-                    PackageInfo info = mContext.getPackageManager().getPackageArchiveInfo(new File(APK_STORE_PATH,FILENAME).getAbsolutePath(),PackageManager.GET_ACTIVITIES);
-                    String  packageName = info.applicationInfo.packageName;
-                    String  version     = info.versionName;
-                    PackageManager sd;
-                    mUpdate.request(APK_STORE_PATH, TaoApplication.getTTIDNum(),version);
-                }
             }
+//            else if(!NOT_UPDATE){
+//                String lastRequestTime = AppPreference.getString("last_request_alipay_time","0");
+//                if(System.currentTimeMillis()-Long.parseLong(lastRequestTime)<24*3600*1000){
+//                    return;
+//                }
+//                if (canDownload()) {
+//                    PackageInfo info = mContext.getPackageManager().getPackageArchiveInfo(new File(APK_STORE_PATH,FILENAME).getAbsolutePath(),PackageManager.GET_ACTIVITIES);
+//                    String  packageName = info.applicationInfo.packageName;
+//                    String  version     = info.versionName;
+//                    PackageManager sd;
+//                    mUpdate.request(APK_STORE_PATH, TaoApplication.getTTIDNum(),version);
+//                }
+//            }
         }
     }
 
