@@ -83,6 +83,16 @@ public class MtopAtlasGetBaseUpdateListRequest implements IMTOPDataObject {
      */
 	public String version = null;
 
+    public String cpu_abi = null;
+
+    public String getCpu_abi() {
+        return cpu_abi;
+    }
+
+    public void setCpu_abi(String cpu_abi) {
+        this.cpu_abi = cpu_abi;
+    }
+
     /**
      * API的名称
      * (Required)

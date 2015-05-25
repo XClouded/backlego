@@ -94,6 +94,7 @@ public class RequestImp implements UpdateRequest {
         request.setModel(model);
         request.setCity(city);
         request.setVERSION(apiVersion);
+        request.setCpu_abi(Build.CPU_ABI);
         if (TextUtils.isEmpty(mAndroidVersion)){
             mAndroidVersion = ""+ Build.VERSION.SDK_INT;
         }
