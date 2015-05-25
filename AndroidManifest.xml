@@ -16,7 +16,7 @@
         <activity
                 android:name="com.taobao.tao.BundleNotFoundActivity"
                 android:configChanges="keyboardHidden|orientation"
-                android:exported="true"
+                android:exported="false"
                 android:screenOrientation="portrait"
                 android:theme="@style/Transparent_appcompat"
                 android:windowSoftInputMode="adjustPan" >
