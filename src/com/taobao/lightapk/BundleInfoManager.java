@@ -10,9 +10,11 @@ import android.taobao.atlas.framework.Atlas;
 import android.text.TextUtils;
 import android.util.Log;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListRequest;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListResponse;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListResponseData;
+import com.taobao.statistic.TBS;
 import com.taobao.tao.Globals;
 import com.taobao.tao.homepage.preference.AppPreference;
 import com.taobao.tao.util.TaoHelper;
@@ -587,11 +589,15 @@ public class BundleInfoManager {
                 bundleInfoStr = getFromAssets(fileName,Globals.getApplication());
             }
             if(!TextUtils.isEmpty(bundleInfoStr)) {
-                List<BundleListing.BundleInfo> infos = JSON.parseArray(bundleInfoStr, BundleListing.BundleInfo.class);
-                BundleListing listing = new BundleListing();
-                listing.setBundles(infos);
-                if (listing != null) {
-                    listingHashMap.put(mainVersion, listing);
+                try {
+                    List<BundleListing.BundleInfo> infos = JSON.parseArray(bundleInfoStr, BundleListing.BundleInfo.class);
+                    BundleListing listing = new BundleListing();
+                    listing.setBundles(infos);
+                    if (listing != null) {
+                        listingHashMap.put(mainVersion, listing);
+                    }
+                }catch(Throwable e){
+                    e.printStackTrace();
                 }
             }
         }
