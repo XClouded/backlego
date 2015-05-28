@@ -22,6 +22,7 @@ import mtopsdk.mtop.domain.MethodEnum;
 import mtopsdk.mtop.domain.MtopResponse;
 import mtopsdk.mtop.intf.Mtop;
 import mtopsdk.mtop.util.MtopConvert;
+import com.taobao.statistic.TBS;
 
 import java.io.*;
 import java.util.*;
@@ -588,6 +589,9 @@ public class BundleInfoManager {
             if(bundleInfoStr==null){
                 bundleInfoStr = getFromAssets(fileName,Globals.getApplication());
             }
+			if (bundleInfoStr==null){
+				TBS.Ext.commitEvent(61005, -3, "", "", "bundleInfoStr is null. file is:" + fileName);
+			}
             if(!TextUtils.isEmpty(bundleInfoStr)) {
                 try {
                     List<BundleListing.BundleInfo> infos = JSON.parseArray(bundleInfoStr, BundleListing.BundleInfo.class);
@@ -597,6 +601,7 @@ public class BundleInfoManager {
                         listingHashMap.put(mainVersion, listing);
                     }
                 }catch(Throwable e){
+                	TBS.Ext.commitEvent(61005, -3, "", "", "parse failed for bundleinfolist " + fileName);
                     e.printStackTrace();
                 }
             }
