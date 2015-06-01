@@ -59,7 +59,12 @@ public class StorageManager {
             "com.taobao.browser",
             "com.taobao.calendar",
         "com.taobao.passivelocation",
-        "com.taobao.taobao.map"};
+        "com.taobao.taobao.map",
+    "com.taobao.android.newtrade",
+    "com.taobao.acds.ACDSApplication",
+    "com.taobao.android.shake",
+            "com.taobao.xiaomi"
+    };
     
     //上次启动的bundle名称
     private String mLastVisitBundle = null;
