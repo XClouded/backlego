@@ -46,7 +46,6 @@ public class BundleInfoManager {
     private final String LIST_FILE_DIR;
     private HashMap<String,BundleListing> listingHashMap = new HashMap<String, BundleListing>(2);
     private List<String> mDownloadList;
-    private static final String CHARSET = "UTF-8";
 
     private BundleInfoManager(){
         LIST_FILE_DIR = Globals.getApplication().getFilesDir().getAbsolutePath()+ File.separatorChar+"bundlelisting"+File.separatorChar;
@@ -146,8 +145,10 @@ public class BundleInfoManager {
                         e.printStackTrace();
                     }
                 }
+                FileWriter fileWritter;
                 try {
-                    BufferedWriter bufferWritter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(bundleInfoFile),CHARSET));
+                    fileWritter = new FileWriter(bundleInfoFile);
+                    BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
                     bufferWritter.write(content);
                     bufferWritter.close();
                 } catch (IOException e) {
@@ -631,7 +632,7 @@ public class BundleInfoManager {
     private String getFromAssets(String fileName,Context context){
         BufferedReader bufReader = null;
         try {
-            InputStreamReader inputReader = new InputStreamReader(context.getResources().getAssets().open(fileName), CHARSET);
+            InputStreamReader inputReader = new InputStreamReader(context.getResources().getAssets().open(fileName) );
             bufReader = new BufferedReader(inputReader);
             String line="";
             String result="";
@@ -657,7 +658,7 @@ public class BundleInfoManager {
         if(file.exists()){
             BufferedReader reader = null;
             try {
-                reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), CHARSET));
+                reader = new BufferedReader(new FileReader(file));
                 String line="";
                 String result="";
                 while((line = reader.readLine()) != null)
