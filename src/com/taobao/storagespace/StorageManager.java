@@ -61,7 +61,7 @@ public class StorageManager {
         "com.taobao.passivelocation",
         "com.taobao.taobao.map",
     "com.taobao.android.newtrade",
-    "com.taobao.acds.ACDSApplication",
+    "com.taobao.acds",
     "com.taobao.android.shake",
             "com.taobao.xiaomi"
     };
