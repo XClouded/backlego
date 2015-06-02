@@ -6,10 +6,12 @@ import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.IBinder;
 import android.os.Looper;
 import android.taobao.util.SafeHandler;
 import android.taobao.util.TaoLog;
 import android.text.TextUtils;
+
 import com.taobao.android.service.Services;
 import com.taobao.android.taoapp.api.ITaoapp;
 import com.taobao.android.taoapp.api.TaoappUtils;
@@ -84,23 +86,16 @@ public class TaoappProxy {
 			Coordinator.postTask(mTask);
 		}
 	}
-	private TaggedRunnable mTask =  new TaggedRunnable("TaoappProxy_load") {
+	
+	class TaoappProxyConnection implements ServiceConnection {
 
-		@Override
-		public void run() {
-			if (mService != null) {
-				return;
-			}
-			long start = System.currentTimeMillis();
-			try {
-				mService = Services.get(context, ITaoapp.class);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			TaoLog.Logd(
-					TAG,
-					"load:" + (mService != null) + "("
-							+ (System.currentTimeMillis() - start) + ")");
+		@Override public void onServiceDisconnected(final ComponentName name) {
+			
+		}
+
+		@Override public void onServiceConnected(ComponentName name, IBinder service) {
+			mService = ITaoapp.Stub.asInterface(service);
+			
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
@@ -111,7 +106,23 @@ public class TaoappProxy {
 			});
 			mRunning.set(false);
 		}
+	}
+	
+	private TaoappProxyConnection mConnection = new TaoappProxyConnection();
+	
+	private TaggedRunnable mTask =  new TaggedRunnable("TaoappProxy_load") {
 
+		@Override
+		public void run() {
+			if (mService != null) {
+				return;
+			}
+			try {
+				Services.bind(context.getApplicationContext(), ITaoapp.class, mConnection);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	};
 	private AtomicBoolean mRunning = new AtomicBoolean();
 	public boolean for360() {
@@ -194,7 +205,8 @@ public class TaoappProxy {
 
 	public void destroy() {
 		if (mService != null) {
-			Services.unget(context, mService);
+			Services.unbind(context.getApplicationContext(), mConnection);
+			mService = null;
 		}
 		try {
 			context.unregisterReceiver(mReceiver);
