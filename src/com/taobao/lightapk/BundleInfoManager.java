@@ -127,16 +127,16 @@ public class BundleInfoManager {
         if(listingHashMap.get(Globals.getVersionName())!=null){
             listingHashMap.put(Globals.getVersionName(),listing);
         }
-        persistListToFile(listing,null);
+        persistListToFile(listing,Globals.getVersionName());
     }
 
-    public void persistListToFile(final BundleListing listing,final String newVersion){
+    public void persistListToFile(final BundleListing listing,final String version){
         new AsyncTask<String, String, String>() {
             @Override
             protected String doInBackground(String... params) {
                 String content= JSON.toJSONString(listing.getBundles());
                 Log.d(TAG,"new listing = "+content);
-                String fileName = String.format("%s%s.json",BUNDLE_LIST_FILE_PREFIX,Globals.getVersionName());
+                String fileName = String.format("%s%s.json",BUNDLE_LIST_FILE_PREFIX,version);
                 File bundleInfoFile = new File(String.format("%s%s",LIST_FILE_DIR,fileName));
                 if(!bundleInfoFile.exists()){
                     try {

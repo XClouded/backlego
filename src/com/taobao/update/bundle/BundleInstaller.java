@@ -152,8 +152,8 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
     protected void onPostExecute(Boolean isSucess) {
 	    super.onPostExecute(isSucess);
 	    if(isSucess){
-	    	String newVersion = Globals.getVersionName();
-            buildBundleInventory(oldVersion,newVersion,mBaselineInfo);
+//	    	String newVersion = Globals.getVersionName();
+            buildBundleInventory(oldVersion,mBaselineInfo.getmBaselineVersion(),mBaselineInfo);
             if(Updater.dynamicdeployForTest && BundleInstaller.isInstallSuccess()){
                 Toast.makeText(Globals.getApplication(),"动态部署成功,待手淘自动退出后点击手淘启动",Toast.LENGTH_SHORT).show();
                 WindowManager windowManager = (WindowManager)Globals.getApplication().getSystemService(Context.WINDOW_SERVICE);

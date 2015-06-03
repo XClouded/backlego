@@ -478,6 +478,7 @@ public class BundleDownloader implements Downloader{
         public void onDownloadFinsh(String apkPath) {
             Log.d("BundleDownloader", "下载成功，开始安装(安装路径："+apkPath+")。。。");
             AppMonitor.Counter.commit("dynamicDeploy", "bundleDownloaded",mBaselineInfo.getmBaselineVersion(), 1);
+
             UpdateUserTrack.bundleUpdateTrack("BundleDownloader","bundle下载成功!");
             BundleInstaller installer = new BundleInstaller(mBaselineInfo,apkPath);
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
