@@ -118,7 +118,7 @@ public class TaoappProxy {
 				return;
 			}
 			try {
-				Services.bind(context.getApplicationContext(), ITaoapp.class, mConnection);
+				Services.bind(context, ITaoapp.class, mConnection);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -205,7 +205,7 @@ public class TaoappProxy {
 
 	public void destroy() {
 		if (mService != null) {
-			Services.unbind(context.getApplicationContext(), mConnection);
+			Services.unbind(context, mConnection);
 			mService = null;
 		}
 		try {
