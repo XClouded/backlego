@@ -8,8 +8,12 @@ public class StorageStatusReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals(Intent.ACTION_DEVICE_STORAGE_LOW)){
-            StorageManager.getInstance(context).freeSpace();
+        try {
+            if (intent.getAction().equals(Intent.ACTION_DEVICE_STORAGE_LOW)) {
+                StorageManager.getInstance(context).freeSpace();
+            }
+        }catch(Exception e){
+
         }
     }
 }
