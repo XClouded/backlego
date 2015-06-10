@@ -20,6 +20,12 @@ public class BundleListing implements IMTOPDataObject{
         return bundles;
     }
 
+    public void insertBundle(BundleInfo bundle){
+        if(bundle!=null){
+            bundles.add(bundle);
+        }
+    }
+
     public void setBundles(List<BundleInfo> bundles) {
         this.bundles = bundles;
     }

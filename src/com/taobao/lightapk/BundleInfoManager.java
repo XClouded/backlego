@@ -173,15 +173,27 @@ public class BundleInfoManager {
         Log.d(TAG,"old listing size = "+ currentListing.getBundles().size());
 
         for(BundleListing.BundleInfo updateInfo : updateBundles){
+            boolean newBundle = true;
             for(BundleListing.BundleInfo oldInfo : currentListing.getBundles()){
                 if(updateInfo.getPkgName().equals(oldInfo.getPkgName())){
                     Log.d(TAG,"info "+ updateInfo.getPkgName());
+                    newBundle = false;
                     oldInfo.setVersion(updateInfo.getVersion());
                     oldInfo.setMd5(updateInfo.getMd5());
                     oldInfo.setSize(updateInfo.getSize());
                     oldInfo.setDependency(updateInfo.getDependency());
                     oldInfo.setUrl(updateInfo.getUrl());
                 }
+            }
+            if(newBundle){
+                BundleListing.BundleInfo info = new BundleListing.BundleInfo();
+                info.setPkgName(updateInfo.getPkgName());
+                info.setVersion(updateInfo.getVersion());
+                info.setMd5(updateInfo.getMd5());
+                info.setSize(updateInfo.getSize());
+                info.setDependency(updateInfo.getDependency());
+                info.setUrl(updateInfo.getUrl());
+                currentListing.insertBundle(info);
             }
         }
         if(listingHashMap.get(newVersion)!=null){
