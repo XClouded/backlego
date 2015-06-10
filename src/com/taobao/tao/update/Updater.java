@@ -18,7 +18,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.taobao.atlas.bundleInfo.BundleInfoList;
 import android.taobao.atlas.framework.Atlas;
+import android.taobao.atlas.framework.BundleImpl;
 import android.taobao.util.NetWork;
 import android.taobao.util.TaoLog;
 import android.text.TextUtils;
@@ -830,29 +832,30 @@ public class Updater implements OnUpdateListener{
         Map<String,String> patchMD5Map = new HashMap<String,String>();
         Map<String,String> packageURLWithpatchMap = new HashMap<String,String>();
         Map<String,String> packageMD5WithpatchMap = new HashMap<String,String>();
+
         for(BundleUpdateInfo info:bundleUpdateList){
             String bundleName = info.mBundleName;
-            File atlasBundle = Atlas.getInstance().getBundleFile(bundleName);
-            String lbMD5 = "";
-            if(atlasBundle!=null && atlasBundle.exists()){
-                lbMD5 = UpdateUtils.getMD5(atlasBundle.getAbsolutePath());
+            if(!Atlas.getInstance().isBundleNeedUpdate(bundleName,info.mVersion)){
+                continue;
             }
-            if(!StringUtil.isEmpty(lbMD5)){
+            if(!TextUtils.isEmpty(info.mPatchDLUrl) && info.mPatchSize>0){
+                File atlasBundle = Atlas.getInstance().getBundleFile(bundleName);
+                String lbMD5 = "";
+                if(atlasBundle!=null && atlasBundle.exists()){
+                    lbMD5 = UpdateUtils.getMD5(atlasBundle.getAbsolutePath());
+                }
                 if(lbMD5.equals(info.mlocalBundleMD5)){
-                    //执行差量下载
-                    if(info.mPatchSize > 0 && !StringUtil.isEmpty(info.mPatchDLUrl)){
-                        urlMap.put(bundleName, info.mPatchDLUrl);
-                        patchsizeMap.put(bundleName, Long.valueOf(info.mPatchSize));
-                        patchMD5Map.put(bundleName,info.mlocalBundleMD5);
-                        packageURLWithpatchMap.put(bundleName,info.mBundleDLUrl);
-                        packageMD5WithpatchMap.put(bundleName, info.mNewBundleMD5);
-                        bbInfo.setmPatchUrlMap(urlMap);
-                        bbInfo.setmPatchSize(patchsizeMap);
-                        bbInfo.setPatchMD5(patchMD5Map);
-                        bbInfo.setPackageURLWithPatch(packageURLWithpatchMap);
-                        bbInfo.setPackageMD5WithPatch(packageMD5WithpatchMap);
-                        bbInfo.setPatchMD5(patchMD5Map);
-                    }
+                    urlMap.put(bundleName, info.mPatchDLUrl);
+                    patchsizeMap.put(bundleName, Long.valueOf(info.mPatchSize));
+                    patchMD5Map.put(bundleName,info.mlocalBundleMD5);
+                    packageURLWithpatchMap.put(bundleName,info.mBundleDLUrl);
+                    packageMD5WithpatchMap.put(bundleName, info.mNewBundleMD5);
+                    bbInfo.setmPatchUrlMap(urlMap);
+                    bbInfo.setmPatchSize(patchsizeMap);
+                    bbInfo.setPatchMD5(patchMD5Map);
+                    bbInfo.setPackageURLWithPatch(packageURLWithpatchMap);
+                    bbInfo.setPackageMD5WithPatch(packageMD5WithpatchMap);
+                    bbInfo.setPatchMD5(patchMD5Map);
                 }else{
                     //执行全量下载
                     if(info.mBundleSize > 0 && !StringUtil.isEmpty(info.mBundleDLUrl)){
