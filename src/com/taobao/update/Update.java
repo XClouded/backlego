@@ -7,6 +7,7 @@ import android.taobao.util.TaoLog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
+import com.taobao.android.task.Coordinator;
 import com.taobao.bspatch.BSPatch;
 import com.taobao.tao.Globals;
 import com.taobao.tao.update.DDUpdateConnectorHelper;
@@ -451,70 +452,65 @@ public class Update{
 			public void onDownloadFinsh(String apkPath) {
 
 				final String tmpAPKPath = apkPath;
-				new AsyncTask<Void,Void,String>(){
+                if(tmpAPKPath != null && tmpAPKPath.endsWith(".apk")){
+                    new AsyncTask<Void,Void,Boolean>(){
 
-					@Override
-					protected String doInBackground(Void... params) {
+                        @Override
+                        protected Boolean doInBackground(Void... params) {
+                            // 增加MD5检查 by leinuo
+                            File apkFile = new File(tmpAPKPath);
+                            String newMD5 = UpdateUtils.getMD5(apkFile.getAbsolutePath());
+                            if(newMD5 ==null || !newMD5.equals(mUpdateInfo.mNewApkMD5)){
+                                //download error
+                                return false;
+                            }
+                            Updater.logUpdateState(mUpdateInfo.mVersion,Updater.STEP_DOWNLOAD,Updater.MODE_ENTIRE);
+                            //apk下载完成则通知
+                            return true;
+                        }
 
-						if(tmpAPKPath != null && tmpAPKPath.endsWith(".apk")){
-							// 增加MD5检查 by leinuo
-							File apkFile = new File(tmpAPKPath);
-							String newMD5 = UpdateUtils.getMD5(apkFile.getAbsolutePath());
-							if(newMD5 ==null || !newMD5.equals(mUpdateInfo.mNewApkMD5)){
-								if(mListener != null) {
-									mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
-								}
-								mIsRunning = false;
-								return null;
-							}
-							Updater.logUpdateState(mUpdateInfo.mVersion,Updater.STEP_DOWNLOAD,Updater.MODE_ENTIRE);
-							//apk下载完成则通知
-//							if(mListener != null) {
-//								mListener.onDownloadFinsh(tmpAPKPath);
-//							}
-							mIsRunning = false;
-							return tmpAPKPath;
-						}else{
-							Updater.logUpdateState(mUpdateInfo.mVersion,Updater.STEP_DOWNLOAD,Updater.MODE_PATCH);
-							if(mUpdateInfo != null){
-								//合并差量包
-								URL url = null;
-								try {
-									url = new URL(mUpdateInfo.mApkDLUrl);
-								} catch (MalformedURLException e2) {
-									e2.printStackTrace();
-								}
-								String fileName = null;
-								if(url == null)
-									fileName = mAppName+"@"+mUpdateInfo.mVersion;
-								else
-									fileName = new File(url.getFile()).getName();
+                        @Override
+                        protected void onPostExecute(Boolean aBoolean) {
+                            if(mListener!=null) {
+                                if (aBoolean) {
+                                    mListener.onDownloadFinsh(tmpAPKPath);
+                                }else{
+                                    mListener.onDownloadError(OnUpdateListener.MD5_VERIFY_FAILED, OnUpdateListener.MD5_VERIFY_FAILEDSTR);
+                                }
+                            }
+                            mIsRunning = false;
+                        }
+                    }.execute();
+                }else{
+                    Updater.logUpdateState(mUpdateInfo.mVersion,Updater.STEP_DOWNLOAD,Updater.MODE_PATCH);
+                    if(mUpdateInfo != null){
+                        //合并差量包
+                        URL url = null;
+                        try {
+                            url = new URL(mUpdateInfo.mApkDLUrl);
+                        } catch (MalformedURLException e2) {
+                            e2.printStackTrace();
+                        }
+                        String fileName = null;
+                        if(url == null)
+                            fileName = mAppName+"@"+mUpdateInfo.mVersion;
+                        else
+                            fileName = new File(url.getFile()).getName();
 
-								if(mApkStorePath == null) {
-									File cache = Globals.getApplication().getExternalCacheDir();
-									if(cache == null)
-										cache = Globals.getApplication().getCacheDir();
-									mApkStorePath = cache.getAbsolutePath();
-								}
-								File newApkFile = new File(mApkStorePath,fileName);
-								mPatchTask = new PatchTask(newApkFile.getAbsolutePath());
-								if(Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
-									mPatchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,tmpAPKPath,mUpdateInfo.mNewApkMD5);
-								else
-									mPatchTask.execute(tmpAPKPath,mUpdateInfo.mNewApkMD5);
-							}
-							return null;
-						}
-					}
-
-					@Override
-					protected void onPostExecute(String result) {
-						if(mListener != null && result != null) {
-							mListener.onDownloadFinsh(result);
-						}
-					}
-
-				}.execute();
+                        if(mApkStorePath == null) {
+                            File cache = Globals.getApplication().getExternalCacheDir();
+                            if(cache == null)
+                                cache = Globals.getApplication().getCacheDir();
+                            mApkStorePath = cache.getAbsolutePath();
+                        }
+                        File newApkFile = new File(mApkStorePath,fileName);
+                        mPatchTask = new PatchTask(newApkFile.getAbsolutePath());
+                        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+                            mPatchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,tmpAPKPath,mUpdateInfo.mNewApkMD5);
+                        else
+                            mPatchTask.execute(tmpAPKPath,mUpdateInfo.mNewApkMD5);
+                    }
+                }
 			}
 		}
 	}
