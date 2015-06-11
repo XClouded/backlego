@@ -277,7 +277,7 @@ public class ForceUpdateNotification {
 			intent.putExtra(Updater.INSTALL_PATH, mApkPath);
 			mContext.sendBroadcast(intent);
 //			PanelManager.getInstance().removeAllPanel();
-			exitApp();
+			//exitApp();
 		}
 		
 	}
