@@ -817,7 +817,7 @@ public class Updater implements OnUpdateListener{
      * @param updateInfo
      */
     private void buildBundleBaselineInfo(UpdateInfo updateInfo){
-        if(updateInfo == null){
+        if(updateInfo == null || updateInfo.getBundleBaselineInfo()==null || updateInfo.getBundleBaselineInfo().getBundleUpdateList()==null){
             return;
         }
         List<BundleUpdateInfo> bundleUpdateList = updateInfo.getBundleBaselineInfo().getBundleUpdateList();
@@ -835,9 +835,9 @@ public class Updater implements OnUpdateListener{
 
         for(BundleUpdateInfo info:bundleUpdateList){
             String bundleName = info.mBundleName;
-//            if(!Atlas.getInstance().isBundleNeedUpdate(bundleName,info.mVersion)){
-//                continue;
-//            }
+            if(!Atlas.getInstance().isBundleNeedUpdate(bundleName,info.mVersion)){
+                continue;
+            }
             if(!TextUtils.isEmpty(info.mPatchDLUrl) && info.mPatchSize>0){
                 File atlasBundle = Atlas.getInstance().getBundleFile(bundleName);
                 String lbMD5 = "";
