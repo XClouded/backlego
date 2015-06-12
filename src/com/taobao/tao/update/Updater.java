@@ -835,9 +835,9 @@ public class Updater implements OnUpdateListener{
 
         for(BundleUpdateInfo info:bundleUpdateList){
             String bundleName = info.mBundleName;
-            if(!Atlas.getInstance().isBundleNeedUpdate(bundleName,info.mVersion)){
-                continue;
-            }
+//            if(!Atlas.getInstance().isBundleNeedUpdate(bundleName,info.mVersion)){
+//                continue;
+//            }
             if(!TextUtils.isEmpty(info.mPatchDLUrl) && info.mPatchSize>0){
                 File atlasBundle = Atlas.getInstance().getBundleFile(bundleName);
                 String lbMD5 = "";
