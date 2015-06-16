@@ -286,16 +286,11 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
         }
     }
 
-    public void rollback(String baseLineVersion){
-        if(TextUtils.isEmpty(baseLineVersion)){
-            return;
-        }
-
-
+    public void rollback(){
         String lastMainVersion = BaselineInfoProvider.getInstance().getMainVersionName();
         if(!TextUtils.isEmpty(lastMainVersion)) {
             List<String> bundles = BaselineInfoProvider.getInstance().getLastDynamicDeployBunldes();
-            if (baseLineVersion.equals(lastMainVersion) && bundles.size() > 0) {
+            if (!Globals.getVersionName().equals(lastMainVersion) && bundles.size() > 0) {
                 //回滚到上个版本
                 if (!Atlas.getInstance().restoreBundle(bundles.toArray(new String[bundles.size()]))) {
                     rollbackHardly();
@@ -308,9 +303,9 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
                 }
                 try {
                     DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(baseinfoFile.getAbsolutePath(), "baselineInfo"))));
-                    out.writeUTF(baseLineVersion);
+                    out.writeUTF(lastMainVersion);
                     out.writeInt(getVersionCode());
-                    out.writeUTF(baseLineVersion);
+                    out.writeUTF(lastMainVersion);
                     out.writeUTF("");
                     out.flush();
                     out.close();

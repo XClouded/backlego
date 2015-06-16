@@ -298,7 +298,7 @@ public class Updater implements OnUpdateListener{
 		        return ;
 		    }
             if(!TextUtils.isEmpty(info.rollback)){
-                rollback(info.rollback);
+                rollback();
                 return;
             }
 		    if((info.mApkDLUrl == null || info.mApkDLUrl.length() == 0)
@@ -835,9 +835,9 @@ public class Updater implements OnUpdateListener{
 
         for(BundleUpdateInfo info:bundleUpdateList){
             String bundleName = info.mBundleName;
-//            if(!Atlas.getInstance().isBundleNeedUpdate(bundleName,info.mVersion)){
-//                continue;
-//            }
+            if(!Atlas.getInstance().isBundleNeedUpdate(bundleName,info.mVersion)){
+                continue;
+            }
             if(!TextUtils.isEmpty(info.mPatchDLUrl) && info.mPatchSize>0){
                 File atlasBundle = Atlas.getInstance().getBundleFile(bundleName);
                 String lbMD5 = "";
@@ -953,13 +953,10 @@ public class Updater implements OnUpdateListener{
         }
     }
 
-    private void rollback(String rollbackVersion)
+    private void rollback()
     {
-        if(TextUtils.isEmpty(rollbackVersion)){
-            return;
-        }
         BundleInstaller installer  = new BundleInstaller();
-        installer.rollback(rollbackVersion);
+        installer.rollback();
     }
 
     public static boolean needRollback(){
