@@ -254,28 +254,23 @@ public class BundleListing implements IMTOPDataObject{
             info.setHost(source.getHost());
             info.setHasSO(source.isHasSO());
             if(source.getDependency()!=null) {
-                ArrayList dependency = new ArrayList(source.getDependency().size());
-                Collections.copy(dependency, source.getDependency());
+                ArrayList dependency = new ArrayList<String>(source.getDependency());
                 info.setDependency(dependency);
             }
             if(source.getActivities()!=null) {
-                ArrayList activies = new ArrayList(source.getActivities().size());
-                Collections.copy(activies, source.getActivities());
+                ArrayList activies = new ArrayList<String>(source.getActivities());
                 info.setActivities(activies);
             }
             if(source.getServices()!=null) {
-                ArrayList services = new ArrayList(source.getServices().size());
-                Collections.copy(services, source.getActivities());
+                ArrayList services = new ArrayList<String>(source.getServices());
                 info.setServices(services);
             }
             if(source.getReceivers()!=null) {
-                ArrayList receivers = new ArrayList(source.getReceivers().size());
-                Collections.copy(receivers, source.getActivities());
+                ArrayList receivers = new ArrayList<String>(source.getReceivers());
                 info.setReceivers(receivers);
             }
             if(source.getContentProviders()!=null) {
-                ArrayList providers = new ArrayList(source.getContentProviders().size());
-                Collections.copy(providers, source.getContentProviders());
+                ArrayList providers = new ArrayList<String>(source.getContentProviders());
                 info.setContentProviders(providers);
             }
             return source;
