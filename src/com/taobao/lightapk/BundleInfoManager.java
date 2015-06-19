@@ -168,7 +168,11 @@ public class BundleInfoManager {
     public void mergeCurrentListWithUpdate(List<BundleListing.BundleInfo> updateBundles,String oldVersion,String newVersion){
         Log.d(TAG,"mergeCurrentListWithUpdate");
         InitBundleInfoByVersionIfNeed(oldVersion);
-        BundleListing currentListing = listingHashMap.get(oldVersion);
+        BundleListing currentListing = BundleListing.clone(listingHashMap.get(oldVersion));
+        if(currentListing==null || currentListing.getBundles()==null){
+            Log.e("BundleInfoManager","list is null is impossible");
+            return;
+        }
         Log.d(TAG,"old listing size = "+ currentListing.getBundles().size());
 
         for(BundleListing.BundleInfo updateInfo : updateBundles){

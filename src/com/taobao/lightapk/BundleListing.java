@@ -4,6 +4,8 @@ import android.taobao.common.i.IMTOPDataObject;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,6 +17,21 @@ public class BundleListing implements IMTOPDataObject{
     public static final int CLASS_TYPE_SERVICE  = 2;
 
     private List<BundleInfo> bundles;
+
+    public static BundleListing clone(BundleListing source){
+        BundleListing listing = new BundleListing();
+        if(source.getBundles()==null){
+            return listing;
+        }
+        List<BundleInfo> infos = new ArrayList<BundleInfo>(source.bundles.size());
+        for(int x=0;x<source.getBundles().size();x++){
+            if(source.getBundles().get(x)!=null) {
+                infos.add(BundleInfo.clone(source.getBundles().get(x)));
+            }
+        }
+        listing.setBundles(infos);
+        return listing;
+    }
 
     public List<BundleInfo> getBundles() {
         return bundles;
@@ -50,7 +67,7 @@ public class BundleListing implements IMTOPDataObject{
         return null;
     }
 
-    public static class BundleInfo {
+    public static class BundleInfo{
         private String name;
         private String pkgName;
 		private String applicationName;
@@ -222,6 +239,46 @@ public class BundleListing implements IMTOPDataObject{
                 }
             }
             return false;
+        }
+
+        public static BundleInfo clone(BundleInfo source){
+            BundleInfo info = new BundleInfo();
+            info.setName(source.getName());
+            info.setPkgName(source.getPkgName());
+            info.setSize(source.getSize());
+            info.setApplicationName(source.getApplicationName());
+            info.setVersion(source.getVersion());
+            info.setDesc(source.getDesc());
+            info.setUrl(source.getUrl());
+            info.setMd5(source.getMd5());
+            info.setHost(source.getHost());
+            info.setHasSO(source.isHasSO());
+            if(source.getDependency()!=null) {
+                ArrayList dependency = new ArrayList(source.getDependency().size());
+                Collections.copy(dependency, source.getDependency());
+                info.setDependency(dependency);
+            }
+            if(source.getActivities()!=null) {
+                ArrayList activies = new ArrayList(source.getActivities().size());
+                Collections.copy(activies, source.getActivities());
+                info.setActivities(activies);
+            }
+            if(source.getServices()!=null) {
+                ArrayList services = new ArrayList(source.getServices().size());
+                Collections.copy(services, source.getActivities());
+                info.setServices(services);
+            }
+            if(source.getReceivers()!=null) {
+                ArrayList receivers = new ArrayList(source.getReceivers().size());
+                Collections.copy(receivers, source.getActivities());
+                info.setReceivers(receivers);
+            }
+            if(source.getContentProviders()!=null) {
+                ArrayList providers = new ArrayList(source.getContentProviders().size());
+                Collections.copy(providers, source.getContentProviders());
+                info.setContentProviders(providers);
+            }
+            return source;
         }
     }
 }
