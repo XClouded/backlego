@@ -26,7 +26,7 @@ public class BundleListing implements IMTOPDataObject{
         List<BundleInfo> infos = new ArrayList<BundleInfo>(source.bundles.size());
         for(int x=0;x<source.getBundles().size();x++){
             if(source.getBundles().get(x)!=null) {
-                infos.add(BundleInfo.clone(source.getBundles().get(x)));
+                infos.add(BundleInfo.cloneWithoutUrl(source.getBundles().get(x)));
             }
         }
         listing.setBundles(infos);
@@ -241,7 +241,7 @@ public class BundleListing implements IMTOPDataObject{
             return false;
         }
 
-        public static BundleInfo clone(BundleInfo source){
+        public static BundleInfo cloneWithoutUrl(BundleInfo source){
             BundleInfo info = new BundleInfo();
             info.setName(source.getName());
             info.setPkgName(source.getPkgName());
@@ -249,7 +249,7 @@ public class BundleListing implements IMTOPDataObject{
             info.setApplicationName(source.getApplicationName());
             info.setVersion(source.getVersion());
             info.setDesc(source.getDesc());
-            info.setUrl(source.getUrl());
+//            info.setUrl(source.getUrl());
             info.setMd5(source.getMd5());
             info.setHost(source.getHost());
             info.setHasSO(source.isHasSO());
