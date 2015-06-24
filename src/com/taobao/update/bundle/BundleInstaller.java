@@ -30,6 +30,7 @@ import com.taobao.lightapk.BundleListing;
 import com.taobao.tao.BaselineInfoProvider;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
+import com.taobao.tao.update.UpdateActivityLifecycleObserver;
 import com.taobao.tao.update.Updater;
 import com.taobao.tao.util.ActivityHelper;
 import com.taobao.update.UpdateUserTrack;
@@ -372,6 +373,7 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
     }
     public static void exitApp(boolean immediately){
         if(sBundlesInstallSuccess || sBundlesRevertSuccess){
+            UpdateActivityLifecycleObserver.clearActivityStack();
             if(immediately){
                 new Handler().postDelayed(new Runnable() {
                     @Override

@@ -12,10 +12,14 @@ import com.taobao.lightapk.BundleListing.BundleInfo;
 import com.taobao.storagespace.StorageManager;
 
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class UpdateActivityLifecycleObserver extends AbstractActivityLifecycleCallbacks {
 
+    private static List<WeakReference<Activity>> sRunningActivityList = new ArrayList<WeakReference<Activity>>();
     @Override
     public void onActivityResumed(final Activity a) {
     	Updater.updateCurrentActivity(a);
@@ -23,6 +27,23 @@ public class UpdateActivityLifecycleObserver extends AbstractActivityLifecycleCa
 
     @Override
     public void onActivityPaused(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+        try {
+            int size = sRunningActivityList.size();
+            for (int x = 0; x < size; x++) {
+                WeakReference<Activity> activityWeakReference = sRunningActivityList.get(x);
+                if (activityWeakReference != null && activityWeakReference.get() != null && activityWeakReference.get() == activity) {
+                    sRunningActivityList.remove(x);
+                    break;
+                }
+            }
+        }catch(Throwable e){
+
+        }
 
     }
 
@@ -36,6 +57,7 @@ public class UpdateActivityLifecycleObserver extends AbstractActivityLifecycleCa
     @Override
     public void onActivityCreated(Activity activity,
             @Nullable Bundle savedInstanceState) {
+        sRunningActivityList.add(new WeakReference<Activity>(activity));
         /**
          * 暂时先关闭
          */
@@ -46,6 +68,19 @@ public class UpdateActivityLifecycleObserver extends AbstractActivityLifecycleCa
 //                StorageManager.getInstance(activity.getApplicationContext()).onBundleStarted(bundleInfo.getPkgName());
 //            }
 //        }
+    }
+
+    public static void clearActivityStack(){
+        int size = sRunningActivityList.size();
+        for(int x=0; x<size; x++){
+            WeakReference<Activity> activityWeakReference = sRunningActivityList.get(x);
+            if(activityWeakReference!=null){
+                Activity activity = activityWeakReference.get();
+                if(activity!=null && !activity.isFinishing()){
+                    activity.finish();
+                }
+            }
+        }
     }
     
 }
