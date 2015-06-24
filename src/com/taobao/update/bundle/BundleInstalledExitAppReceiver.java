@@ -45,11 +45,11 @@ public class BundleInstalledExitAppReceiver extends BroadcastReceiver {
             UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver", "Bundle安装成功，杀进程失败");
         }
     }
-    private static void cancelAlarmService(){
+    public static void cancelAlarmService(){
         AlarmManager am = (AlarmManager)Globals.getApplication().getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(Globals.getApplication(),com.taobao.update.bundle.BundleInstalledExitAppReceiver.class);
         intent.setAction(KILLER_ACTION);
-        PendingIntent sender = PendingIntent.getBroadcast(Globals.getApplication(), 0, intent, 0);
+        PendingIntent sender = PendingIntent.getBroadcast(Globals.getApplication(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         am.cancel(sender);
         Log.d("BundleInstalledExitAppReceiver", "取消ALARM_SERVICE！！");
     }

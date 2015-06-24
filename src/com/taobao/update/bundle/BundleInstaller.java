@@ -1,8 +1,10 @@
 package com.taobao.update.bundle;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -10,6 +12,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.taobao.atlas.framework.Atlas;
 import android.text.TextUtils;
@@ -370,15 +373,38 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
     public static void exitApp(boolean immediately){
         if(sBundlesInstallSuccess || sBundlesRevertSuccess){
             if(immediately){
-                UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver","Bundle安装成功，开始杀进程");
-                android.os.Process.killProcess(android.os.Process.myPid());
-                ActivityHelper.kill();
-//                UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver","Bundle安装成功，杀进程失败");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(isAppRunningBackground()) {
+                            BundleInstalledExitAppReceiver.cancelAlarmService();
+                            UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver", "Bundle安装成功，开始杀进程");
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            ActivityHelper.kill();
+                        }
+                    }
+                },8000);
             }else {
                 killProcess();
             }
         }
     }
+
+    public static boolean isAppRunningBackground(){
+        ActivityManager am = (ActivityManager) Globals.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
+        String taoPackageName = Globals.getApplication().getPackageName();
+        try {
+            ComponentName cnTop = am.getRunningTasks(1).get(0).topActivity;
+            ComponentName cnBase = am.getRunningTasks(1).get(0).baseActivity;
+            if ((!taoPackageName.equals(cnTop.getPackageName())) && (!taoPackageName.equals(cnBase.getPackageName()))) {
+                return true;
+            }
+        }catch(Exception e){
+            return true;
+        }
+        return false;
+    }
+
     private static void killProcess(){
         if((TaoApplication.getProcessName(Globals.getApplication())).equals(Globals.getApplication().getPackageName())){
             AlarmManager am = (AlarmManager)Globals.getApplication().getSystemService(Context.ALARM_SERVICE);
