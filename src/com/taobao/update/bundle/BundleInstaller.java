@@ -373,8 +373,8 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
     }
     public static void exitApp(boolean immediately){
         if(sBundlesInstallSuccess || sBundlesRevertSuccess){
-            UpdateActivityLifecycleObserver.clearActivityStack();
             if(immediately){
+                UpdateActivityLifecycleObserver.clearActivityStack();
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
