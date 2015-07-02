@@ -273,7 +273,7 @@ public class BundleListing implements IMTOPDataObject{
                 ArrayList providers = new ArrayList<String>(source.getContentProviders());
                 info.setContentProviders(providers);
             }
-            return source;
+            return info;
         }
     }
 }
