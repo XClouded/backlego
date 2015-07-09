@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import com.taobao.lightapk.BundleInfoManager;
-import com.taobao.lightapk.BundleListing.BundleInfo;
+import android.taobao.atlas.bundleInfo.BundleListing.BundleInfo;
 import com.taobao.lego.R;
 import org.osgi.framework.Bundle;
 

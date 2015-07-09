@@ -1,20 +1,16 @@
 package com.taobao.lightapk;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StatFs;
+import android.taobao.atlas.bundleInfo.AtlasBundleInfoManager;
+import android.taobao.atlas.bundleInfo.BundleListing;
 import android.taobao.atlas.framework.Atlas;
 import android.text.TextUtils;
 import android.util.Log;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListRequest;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListResponse;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListResponseData;
-import com.taobao.statistic.TBS;
 import com.taobao.tao.Globals;
 import com.taobao.tao.homepage.preference.AppPreference;
 import com.taobao.tao.util.TaoHelper;
@@ -22,7 +18,6 @@ import mtopsdk.mtop.domain.MethodEnum;
 import mtopsdk.mtop.domain.MtopResponse;
 import mtopsdk.mtop.intf.Mtop;
 import mtopsdk.mtop.util.MtopConvert;
-import com.taobao.statistic.TBS;
 
 import java.io.*;
 import java.util.*;
@@ -42,18 +37,9 @@ public class BundleInfoManager {
      * 本地含有的bundle,包括安装和未安装的
      */
     public static List<String> sInternalBundles;
-    private final String BUNDLE_LIST_FILE_PREFIX = "bundleInfo-";
-    private final String LIST_FILE_DIR;
-    private HashMap<String,BundleListing> listingHashMap = new HashMap<String, BundleListing>(2);
-    private List<String> mDownloadList;
-    private static final String CHARSET = "UTF-8";
+    private BundleListing currentListing;
 
     private BundleInfoManager(){
-        LIST_FILE_DIR = Globals.getApplication().getFilesDir().getAbsolutePath()+ File.separatorChar+"bundlelisting"+File.separatorChar;
-        File file = new File(LIST_FILE_DIR);
-        if(!file.exists()){
-            file.mkdirs();
-        }
     }
 
     public static synchronized BundleInfoManager instance(){
@@ -64,8 +50,7 @@ public class BundleInfoManager {
     }
 
     public BundleListing getBundleListing(){
-        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
-        return listingHashMap.get(Globals.getVersionName());
+        return currentListing;
     }
 
     /*
@@ -97,8 +82,8 @@ public class BundleInfoManager {
 
     public BundleListing.BundleInfo getBundleInfoByPkg(String name)
     {
-        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
-        BundleListing listing = listingHashMap.get(Globals.getVersionName());
+        InitBundleInfoByVersionIfNeed();
+        BundleListing listing = currentListing;
         if(listing!=null && listing.getBundles()!=null) {
             for (BundleListing.BundleInfo info : listing.getBundles()){
                 if(info.getPkgName().equals(name)){
@@ -112,8 +97,8 @@ public class BundleInfoManager {
      * 更新bundle相关的下载信息
      */
     public void updateBundleDownloadInfo(MtopTaobaoClientGetBundleListResponseData dataList){
-        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
-        BundleListing listing = listingHashMap.get(Globals.getVersionName());
+        InitBundleInfoByVersionIfNeed();
+        BundleListing listing = currentListing;
         for(BundleListing.BundleInfo info : listing.getBundles()){
             for(MtopTaobaoClientGetBundleListResponseData.Item item : dataList.getBundleList()){
                 if(item!=null && item.getName().equals(info.getPkgName())){
@@ -125,84 +110,7 @@ public class BundleInfoManager {
                 }
             }
         }
-        if(listingHashMap.get(Globals.getVersionName())!=null){
-            listingHashMap.put(Globals.getVersionName(),listing);
-        }
-        persistListToFile(listing,Globals.getVersionName());
-    }
-
-    public void persistListToFile(final BundleListing listing,final String version){
-        new AsyncTask<String, String, String>() {
-            @Override
-            protected String doInBackground(String... params) {
-                String content= JSON.toJSONString(listing.getBundles());
-                Log.d(TAG,"new listing = "+content);
-                String fileName = String.format("%s%s.json",BUNDLE_LIST_FILE_PREFIX,version);
-                File bundleInfoFile = new File(String.format("%s%s",LIST_FILE_DIR,fileName));
-                if(!bundleInfoFile.exists()){
-                    try {
-                        bundleInfoFile.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                try {
-                    BufferedWriter bufferWritter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(bundleInfoFile),CHARSET));
-                    bufferWritter.write(content);
-                    bufferWritter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return "";
-            }
-        }.execute();
-
-    }
-
-    /**
-     * 更新当前清单
-     * @param updateBundles 更新的bundle列表
-     * @param oldVersion 主客老版本
-     * @param newVersion 主客新版本
-     */
-    public void mergeCurrentListWithUpdate(List<BundleListing.BundleInfo> updateBundles,String oldVersion,String newVersion){
-        Log.d(TAG,"mergeCurrentListWithUpdate");
-        InitBundleInfoByVersionIfNeed(oldVersion);
-        BundleListing currentListing = BundleListing.clone(listingHashMap.get(oldVersion));
-        if(currentListing==null || currentListing.getBundles()==null){
-            Log.e("BundleInfoManager","list is null is impossible");
-            return;
-        }
-        Log.d(TAG,"old listing size = "+ currentListing.getBundles().size());
-
-        for(BundleListing.BundleInfo updateInfo : updateBundles){
-            boolean newBundle = true;
-            for(BundleListing.BundleInfo oldInfo : currentListing.getBundles()){
-                if(updateInfo.getPkgName().equals(oldInfo.getPkgName())){
-                    Log.d(TAG,"info "+ updateInfo.getPkgName());
-                    newBundle = false;
-                    oldInfo.setVersion(updateInfo.getVersion());
-                    oldInfo.setMd5(updateInfo.getMd5());
-                    oldInfo.setSize(updateInfo.getSize());
-                    oldInfo.setDependency(updateInfo.getDependency());
-                    oldInfo.setUrl(updateInfo.getUrl());
-                }
-            }
-            if(newBundle){
-                BundleListing.BundleInfo info = new BundleListing.BundleInfo();
-                info.setPkgName(updateInfo.getPkgName());
-                info.setVersion(updateInfo.getVersion());
-                info.setMd5(updateInfo.getMd5());
-                info.setSize(updateInfo.getSize());
-                info.setDependency(updateInfo.getDependency());
-                info.setUrl(updateInfo.getUrl());
-                currentListing.insertBundle(info);
-            }
-        }
-        if(listingHashMap.get(newVersion)!=null){
-            listingHashMap.put(newVersion,currentListing);
-        }
-        persistListToFile(currentListing,newVersion);
+        AtlasBundleInfoManager.instance().persistListToFile(listing,Globals.getVersionName());
     }
 
     /**
@@ -214,8 +122,8 @@ public class BundleInfoManager {
         if(pkgs==null){
             return null;
         }
-        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
-        BundleListing listing = listingHashMap.get(Globals.getVersionName());
+        InitBundleInfoByVersionIfNeed();
+        BundleListing listing = currentListing;
         BatchBundleDownloader.DownloadItem[] item = new BatchBundleDownloader.DownloadItem[pkgs.size()];
         for(int x=0; x<pkgs.size(); x++){
             String pkg = pkgs.get(x);
@@ -238,100 +146,12 @@ public class BundleInfoManager {
      * @return
      */
     public BundleListing.BundleInfo findBundleByActivity(String className){
-        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
-        BundleListing listing = listingHashMap.get(Globals.getVersionName());
+        InitBundleInfoByVersionIfNeed();
+        BundleListing listing = currentListing;
         if(listing!=null){
              return listing.resolveBundle(className,BundleListing.CLASS_TYPE_ACTIVITY);
         }
         return null;
-    }
-
-    /**
-     * 根据service名字查找bundle信息
-     * @param className
-     * @return
-     */
-    public BundleListing.BundleInfo findlBundleByService(String className) {
-        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
-        BundleListing listing = listingHashMap.get(Globals.getVersionName());
-        if (listing != null) {
-            return listing.resolveBundle(className, BundleListing.CLASS_TYPE_SERVICE);
-        }
-        return null;
-    }
-
-    /**
-     * 删除老的清单
-     * @param mainVersion
-     */
-    public void removeBundleListing(){
-//        Log.d(TAG,"remove bundle version= "+mainVersion);
-//        String fileName = String.format("%s%s.json",BUNDLE_LIST_FILE_PREFIX,mainVersion);
-//        String filePath = String.format("%s%s",LIST_FILE_DIR,fileName);
-//        File file = new File(filePath);
-//        if(file.exists()){
-//            file.delete();
-//        }
-        File file =new File(LIST_FILE_DIR);
-        if(file.exists() && file.isDirectory()){
-            File[] files = file.listFiles();
-            for(File item : files){
-                item.delete();
-            }
-
-        }
-    }
-
-    /**
-     * 查找已安装的版本兼容的bundle
-     * @param bundlePkgHasInstalled 已经安装的bundle列表
-     * @param oldMainVersion    老的主客版本
-     * @param newMainVersion    新的主客版本
-     * @param ifAutoUpdateDifferentVersionBundle  是否自动更新已安装的不兼容bundle
-     * @return  返回不需要更新的bundle
-     */
-    public ArrayList<String> resolveSameVersionBundle(String[] bundlePkgHasInstalled,String oldMainVersion,String newMainVersion,
-                                             boolean ifAutoUpdateDifferentVersionBundle){
-        ArrayList<String> sameListWhichHasInstalled = new ArrayList<String>();
-        ArrayList<String> differentWhichHasInstalled= new ArrayList<String>();
-
-        if(bundlePkgHasInstalled==null || TextUtils.isEmpty(oldMainVersion) || TextUtils.isEmpty(newMainVersion)){
-            return null;
-        }
-        InitBundleInfoByVersionIfNeed(oldMainVersion);
-        InitBundleInfoByVersionIfNeed(newMainVersion);
-        BundleListing oldListing = listingHashMap.get(oldMainVersion);
-        BundleListing newListing = listingHashMap.get(newMainVersion);
-        if(oldListing==null || newListing==null || oldListing.getBundles()==null || newListing.getBundles()==null){
-            return null;
-        }
-
-        for(BundleListing.BundleInfo info : oldListing.getBundles()){
-            Log.d(TAG,info.getPkgName() +"|"+info.getVersion()+";");
-        }
-        for(BundleListing.BundleInfo info : newListing.getBundles()){
-            Log.d(TAG,info.getPkgName() +"|"+info.getVersion()+";");
-        }
-        ArrayList<String> sameList = resolveSameVersion(newListing,oldListing);
-        Log.d(TAG,"size = "+ sameList.size());
-
-        if(sameList==null || sameList.size()==0){
-            return sameListWhichHasInstalled;
-        }
-        Log.d(TAG,"installed size = "+ bundlePkgHasInstalled.length+"");
-        for(String pkg : bundlePkgHasInstalled){
-            if(pkg!=null && sameList.contains(pkg)){
-                sameListWhichHasInstalled.add(pkg);
-            }else{
-                differentWhichHasInstalled.add(pkg);
-            }
-        }
-        Log.d(TAG,"same size = "+ sameListWhichHasInstalled.size()+"");
-        if(differentWhichHasInstalled!=null){
-            storeHighPriorityBundles(differentWhichHasInstalled);
-            downAndInstallHightPriorityBundleIfNeed();
-        }
-        return sameListWhichHasInstalled;
     }
 
     private final String HIGH_PRIORITY_BUNDLES_FORDOWNLOAD = "HIGH_PRIORITY_BUNDLES_FORDOWNLOAD";
@@ -359,18 +179,6 @@ public class BundleInfoManager {
 
     }
 
-    public void updateHighPriorityBundleByAdd(String pkg){
-        if(pkg==null){
-            return;
-        }
-        String joined = AppPreference.getString(HIGH_PRIORITY_BUNDLES_FORDOWNLOAD,"");
-        if(joined!=null){
-            List<String> pkgList = Arrays.asList(joined.split(","));
-            pkgList.add(pkg);
-            storeHighPriorityBundles(pkgList);
-        }
-    }
-
     public static String getPackageNameFromEntryName(String entryName) {
         String packageName = entryName.substring(entryName.indexOf("lib/armeabi/lib") + "lib/armeabi/lib".length(),
                 entryName.indexOf(".so"));
@@ -384,8 +192,9 @@ public class BundleInfoManager {
         String prefix = "lib/armeabi/libcom_";
         String suffix = ".so";
         sInternalBundles = new ArrayList<String>();
+        ZipFile zipFile = null;
         try {
-            ZipFile zipFile = new ZipFile(Globals.getApplication().getApplicationInfo().sourceDir);
+            zipFile = new ZipFile(Globals.getApplication().getApplicationInfo().sourceDir);
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry zipEntry = entries.nextElement();
@@ -396,6 +205,12 @@ public class BundleInfoManager {
             }
         } catch (Exception e) {
             Log.e(TAG, "Exception while get bundles in assets or lib", e);
+        }finally {
+            try{
+                if(zipFile!=null){
+                    zipFile.close();
+                }
+            }catch(Exception e){}
         }
     }
 
@@ -403,7 +218,7 @@ public class BundleInfoManager {
      * 静默下载高优先级bundle
      */
     public void downAndInstallHightPriorityBundleIfNeed(){
-        InitBundleInfoByVersionIfNeed(Globals.getVersionName());
+        InitBundleInfoByVersionIfNeed();
         if(sInternalBundles ==null){
             resolveInternalBundles();
         }
@@ -422,7 +237,7 @@ public class BundleInfoManager {
             pkgs.addAll(list);
         }
         if(canExtendSilentDownload()) {
-            BundleListing listing = listingHashMap.get(Globals.getVersionName());
+            BundleListing listing = currentListing;
             if (listing != null && listing.getBundles() != null) {
                 ArrayList<BundleListing.BundleInfo> infos = (ArrayList<BundleListing.BundleInfo>) listing.getBundles();
                 if (infos != null) {
@@ -569,134 +384,6 @@ public class BundleInfoManager {
         }
     }
 
-
-    /**
-     * 清单对比，查找两个版本里面版本兼容的bundle
-     * @param newListing
-     * @param oldListing
-     * @return
-     */
-    private ArrayList<String> resolveSameVersion(BundleListing newListing,BundleListing oldListing){
-        ArrayList<String> sameList = new ArrayList<String>();
-        if(newListing==null || oldListing==null){
-            return sameList;
-        }
-        for(BundleListing.BundleInfo oldInfo : oldListing.getBundles()){
-            for(BundleListing.BundleInfo newInfo : newListing.getBundles()){
-                if(oldInfo!=null && newInfo!=null && oldInfo.getVersion()!=null && newInfo.getVersion()!=null &&  oldInfo.getPkgName().equals(newInfo.getPkgName())
-                        && oldInfo.getVersion().equals(newInfo.getVersion())){
-                    sameList.add(oldInfo.getPkgName());
-                }
-            }
-        }
-        return sameList;
-    }
-
-
-
-    /**
-     * 根据版本载入清单
-     */
-    private void InitBundleInfoByVersionIfNeed(String mainVersion){
-        if(listingHashMap.get(mainVersion)==null){
-            String fileName = String.format("%s%s.json",BUNDLE_LIST_FILE_PREFIX,mainVersion);
-            String bundleInfoStr = getFromFile(String.format("%s%s",LIST_FILE_DIR,fileName));
-            if(bundleInfoStr==null){
-                bundleInfoStr = getFromAssets(fileName,Globals.getApplication());
-            }
-			if (bundleInfoStr==null){
-				TBS.Ext.commitEvent(61005, -3, "", "", "bundleInfoStr is null. file is:" + fileName);
-			}
-            if(!TextUtils.isEmpty(bundleInfoStr)) {
-                try {
-                    List<BundleListing.BundleInfo> infos = JSON.parseArray(bundleInfoStr, BundleListing.BundleInfo.class);
-                    BundleListing listing = new BundleListing();
-                    listing.setBundles(infos);
-                    if (listing != null) {
-                        listingHashMap.put(mainVersion, listing);
-                    }
-                }catch(Throwable e){
-                	TBS.Ext.commitEvent(61005, -3, "", "", "parse failed for bundleinfolist " + fileName);
-                    e.printStackTrace();
-                }
-            }
-        }
-
-    }
-
-    /**
-     * 更新bundle信息
-     * @param mainVersion
-     */
-    private void updateBundleInfoByVersion(String mainVersion){
-        if(listingHashMap.get(mainVersion)!=null){
-            String fileName = String.format("%s%s.json",BUNDLE_LIST_FILE_PREFIX,mainVersion);
-            String bundleInfoStr = getFromFile(String.format("%s%s",LIST_FILE_DIR,fileName));
-            if(bundleInfoStr==null){
-                bundleInfoStr = getFromAssets(fileName,Globals.getApplication());
-            }
-            List<BundleListing.BundleInfo> infos = JSON.parseArray(bundleInfoStr, BundleListing.BundleInfo.class);
-            BundleListing listing = new BundleListing();
-            listing.setBundles(infos);
-            if(listing!=null){
-                listingHashMap.put(mainVersion,listing);
-            }
-        }
-    }
-
-    private String getFromAssets(String fileName,Context context){
-        BufferedReader bufReader = null;
-        try {
-            InputStreamReader inputReader = new InputStreamReader(context.getResources().getAssets().open(fileName), CHARSET);
-            bufReader = new BufferedReader(inputReader);
-            String line="";
-            String result="";
-            while((line = bufReader.readLine()) != null)
-                result += line;
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if(bufReader!=null){
-                try {
-                    bufReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private String getFromFile(String fileName){
-        File file = new File(fileName);
-        if(file.exists()){
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), CHARSET));
-                String line="";
-                String result="";
-                while((line = reader.readLine()) != null)
-                    result += line;
-                return result;
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e){
-                e.printStackTrace();
-            } finally {
-                if(reader!=null){
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-        }
-        return null;
-    }
-
     private int getNumCores() {
         //Private Class to display only CPU devices in the directory listing
         class CpuFilter implements FileFilter {
@@ -725,5 +412,15 @@ public class BundleInfoManager {
             //Default to return 1 core
             return 1;
         }
+    }
+
+    /**
+     * 根据版本载入清单
+     */
+    private void InitBundleInfoByVersionIfNeed(){
+        if(currentListing==null){
+            currentListing = AtlasBundleInfoManager.instance().getBundleInfo();
+        }
+
     }
 }

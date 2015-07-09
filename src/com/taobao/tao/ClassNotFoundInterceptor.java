@@ -4,16 +4,15 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import android.taobao.atlas.bundleInfo.BundleInfoList;
+import android.taobao.atlas.bundleInfo.AtlasBundleInfoManager;
+import android.taobao.atlas.bundleInfo.BundleListing;
 import android.taobao.atlas.framework.Atlas;
 import android.taobao.atlas.runtime.ClassNotFoundInterceptorCallback;
 import android.text.TextUtils;
 import android.util.Log;
 import com.taobao.android.nav.Nav;
 import com.taobao.lightapk.BundleInfoManager;
-import com.taobao.lightapk.BundleListing;
 
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +44,7 @@ public class ClassNotFoundInterceptor implements ClassNotFoundInterceptorCallbac
         if(className!=null && className.equals("com.taobao.tao.welcome.Welcome")){
             return intent;
         }
-        String bundleName = BundleInfoList.getInstance().getBundleForComponet(className);
+        String bundleName = AtlasBundleInfoManager.instance().getBundleForComponet(className);
         if(BundleInfoManager.sInternalBundles==null){
             BundleInfoManager.instance().resolveInternalBundles();
         }

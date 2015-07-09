@@ -2,18 +2,17 @@ package com.taobao.update.bundle;
 
 import android.app.ActivityManager;
 import android.app.AlarmManager;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.taobao.atlas.bundleInfo.AtlasBundleInfoManager;
 import android.taobao.atlas.framework.Atlas;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,7 +25,7 @@ import android.widget.Toast;
 import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.bspatch.BSPatch;
 import com.taobao.lightapk.BundleInfoManager;
-import com.taobao.lightapk.BundleListing;
+import android.taobao.atlas.bundleInfo.BundleListing;
 import com.taobao.tao.BaselineInfoProvider;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
@@ -262,7 +261,7 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
                     baseLineFile.delete();
                 }
             }
-            BundleInfoManager.instance().removeBundleListing();
+            AtlasBundleInfoManager.instance().removeBundleListing();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -439,7 +438,7 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
     				inventoryList.add(inventory);
     			}
     		}
-    		BundleInfoManager.instance().mergeCurrentListWithUpdate(inventoryList, oldVersion, newVersion);            
+    		AtlasBundleInfoManager.instance().saveNewBundlelisingWithMerge(inventoryList, newVersion);
     	}
     	
     }

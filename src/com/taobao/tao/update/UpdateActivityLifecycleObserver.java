@@ -5,11 +5,7 @@ package com.taobao.tao.update;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.taobao.util.Globals;
 import com.taobao.android.compat.ApplicationCompat.AbstractActivityLifecycleCallbacks;
-import com.taobao.lightapk.BundleInfoManager;
-import com.taobao.lightapk.BundleListing.BundleInfo;
-import com.taobao.storagespace.StorageManager;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;

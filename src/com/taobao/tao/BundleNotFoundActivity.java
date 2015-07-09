@@ -24,7 +24,7 @@ import com.taobao.android.nav.Nav;
 import com.taobao.lightapk.BatchBundleDownloader;
 import com.taobao.lightapk.BatchBundleInstaller;
 import com.taobao.lightapk.BundleInfoManager;
-import com.taobao.lightapk.BundleListing;
+import android.taobao.atlas.bundleInfo.BundleListing;
 import com.taobao.statistic.TBS;
 import com.taobao.tao.util.NetWorkUtils;
 import com.taobao.lego.R;
