@@ -45,15 +45,14 @@ public class AtlasCrossActivityReceiver extends BroadcastReceiver{
                    ((PanguApplication)Globals.getApplication()).registerActivityLifecycleCallbacks(new UpdateActivityLifecycleObserver());
 
                }
-//               if(Globals.isMiniPackage()) {
-                   mSafeHandler = new SafeHandler(Looper.getMainLooper());
-                   mSafeHandler.postDelayed(new Runnable() {
-                       @Override
-                       public void run() {
-                           BundleInfoManager.instance().downAndInstallHightPriorityBundleIfNeed();
-                       }
-                   }, 25000);
-//               }
+               mSafeHandler = new SafeHandler(Looper.getMainLooper());
+               mSafeHandler.postDelayed(new Runnable() {
+                   @Override
+                   public void run() {
+                       BundleInfoManager.instance().downAndInstallHightPriorityBundleIfNeed();
+                   }
+               }, 25000);
+
            }else if(value.equals(AppStateBroadcastManager.STOP)){
                BundleInstaller.exitApp(false);
 

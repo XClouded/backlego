@@ -111,8 +111,12 @@ public class Updater implements OnUpdateListener{
     private static String sApkPath;
     private static UpdateInfo sUpdateInfo;
     public static boolean sPatchInstall = false;
+    public static UpdateInfo sForgroundUpdateInfo = null;
+    private UpdateLister mUpdateListener;
+    private boolean mControlByOutSide = false;
 
-	protected Updater(Application app) {
+
+    protected Updater(Application app) {
 		mApp = app;
 		mContext = app.getApplicationContext();
 		mBundleDownloader = new BundleDownloader(mContext);
@@ -183,68 +187,89 @@ public class Updater implements OnUpdateListener{
             Constants.showToast(Globals.getApplication(),"当前正在更新中");
         }
     }
-	
-	/**
+
+
+    public void setUpdateListener(UpdateLister listener){
+        mUpdateListener = listener;
+    }
+
+    public void setControlByOutSide(boolean flag){
+        mControlByOutSide = flag;
+    }
+
+
+    /**
 	 * 请求更新
 	 * @param background	是否为后台请求
 	 */
 	public void update(boolean background) {
-	    if(background && (System.currentTimeMillis() - sLastCheckTime < CHECK_INTERVAL)){
-	        TaoLog.Logd("Updater", "no need to update");
-	        return;
-	    }
-	    sLastCheckTime = System.currentTimeMillis();
-		// 罗喉，去掉所有渠道更新时间延迟判断。
-		// int status = getUpdateStatus();
-		// TaoLog.Logd(TaoLog.TAOBAO_TAG, "init autoUpdateCheck status "+status);
-		// if(UPDATE_UNKNOW==status||UPDATE_DISABLE==status){
-		// return ;
-		// }
-		TaoLog.Logd("Updater", "update:"+background);
-		// 如果是联想手机，手动升级提示去联想商店升级
-		if (Constants.isLephone()) {
-			if (!mBackgroundRequest) {
-				Constants.showToast(R.string.updata_lephone_text);
-			}
-			// 联想手机无自动升级功能??
-			return;
-		}
-		
-		if(mBackgroundDownload){
-			//正在进行后台下载，用户点击更新时，重新发起流程
-			if(mTmpConfirm != null)
-				mTmpConfirm.cancel();
-			if(mBackgroundInstall != null)
-				mBackgroundInstall.cancel(true);
-		}
-		String version = "";
-		if(sAtlasDDSuccess){
-			//FIXME: PackageInfo packageInfo = AtlasDD.getInstance().getLastestApkInfo();
-		    PackageInfo packageInfo = null;
-			if(packageInfo != null)
-				version = packageInfo.versionName;
-		}else{
-			version = Globals.getVersionName();
-		}
-		//TODO:主客更新请求及bundle更新请求版本，需要服务端处理！
-		if(mUpdate.request(getApkPath(), TaoApplication.getTTIDNum(), version)){
-			//启动新的更新
-			mBackgroundRequest = background;
-			mTmpConfirm = null;
-//			mTmpUpdateInfo = null;
-		}else{
-			//更新已经启动
-			if(!mBackgroundRequest){
-				//上次进行的是用于启动更新，则提示用户稍等
-				Constants.showToast(R.string.notice_update_checking);
-			}
-			if(!background){
-				
-				//已经在更新，用户点击更新可以改变更新状态
-				mBackgroundRequest = background;
-				
-			}
-		}
+//	    if(background && (System.currentTimeMillis() - sLastCheckTime < CHECK_INTERVAL)){
+//	        TaoLog.Logd("Updater", "no need to update");
+//	        return;
+//	    }
+//
+//        if(mTmpUpdateInfo!=null && mTmpConfirm!=null && !background && mControlByOutSide && mUpdateListener!=null){
+//            if((mTmpUpdateInfo.mApkDLUrl == null || mTmpUpdateInfo.mApkDLUrl.length() == 0)
+//                    && (mTmpUpdateInfo.mPatchDLUrl == null || mTmpUpdateInfo.mPatchDLUrl.length() == 0)){
+//                mUpdateListener.onNoUpdate();
+//            }else{
+//                mUpdateListener.onNeedUpdate();
+//            }
+//            return;
+//        }
+//
+//        sLastCheckTime = System.currentTimeMillis();
+//		// 罗喉，去掉所有渠道更新时间延迟判断。
+//		// int status = getUpdateStatus();
+//		// TaoLog.Logd(TaoLog.TAOBAO_TAG, "init autoUpdateCheck status "+status);
+//		// if(UPDATE_UNKNOW==status||UPDATE_DISABLE==status){
+//		// return ;
+//		// }
+//		TaoLog.Logd("Updater", "update:"+background);
+//		// 如果是联想手机，手动升级提示去联想商店升级
+//		if (Constants.isLephone()) {
+//			if (!mBackgroundRequest) {
+//				Constants.showToast(R.string.updata_lephone_text);
+//			}
+//			// 联想手机无自动升级功能??
+//			return;
+//		}
+//
+//		if(mBackgroundDownload){
+//			//正在进行后台下载，用户点击更新时，重新发起流程
+//			if(mTmpConfirm != null)
+//				mTmpConfirm.cancel();
+//			if(mBackgroundInstall != null)
+//				mBackgroundInstall.cancel(true);
+//		}
+//		String version = "";
+//		if(sAtlasDDSuccess){
+//			//FIXME: PackageInfo packageInfo = AtlasDD.getInstance().getLastestApkInfo();
+//		    PackageInfo packageInfo = null;
+//			if(packageInfo != null)
+//				version = packageInfo.versionName;
+//		}else{
+//			version = Globals.getVersionName();
+//		}
+//		//TODO:主客更新请求及bundle更新请求版本，需要服务端处理！
+//		if(mUpdate.request(getApkPath(), TaoApplication.getTTIDNum(), version)){
+//			//启动新的更新
+//			mBackgroundRequest = background;
+//			mTmpConfirm = null;
+////			mTmpUpdateInfo = null;
+//		}else{
+//			//更新已经启动
+//			if(!mBackgroundRequest){
+//				//上次进行的是用于启动更新，则提示用户稍等
+//				Constants.showToast(R.string.notice_update_checking);
+//			}
+//			if(!background){
+//
+//				//已经在更新，用户点击更新可以改变更新状态
+//				mBackgroundRequest = background;
+//
+//			}
+//		}
 	}
 	
 	
@@ -283,7 +308,11 @@ public class Updater implements OnUpdateListener{
 				}else{
 					Constants.showToast(Globals.getApplication().getString(R.string.notice_errorupdate));
 				}
-				return;
+                if(mUpdateListener!=null && mControlByOutSide){
+                    mUpdateListener.onNoUpdate();
+                }
+
+                return;
 			}
 		}else{
 		    if(info.getBundleBaselineInfo() !=null && mBackgroundRequest && !BundleInstaller.isInstallSuccess()){
@@ -302,7 +331,10 @@ public class Updater implements OnUpdateListener{
             }
 		    if((info.mApkDLUrl == null || info.mApkDLUrl.length() == 0)
                     && (info.mPatchDLUrl == null || info.mPatchDLUrl.length() == 0)){
-		        //无更新
+                if(mUpdateListener!=null && mControlByOutSide){
+                    mUpdateListener.onNoUpdate();
+                }
+                //无更新
 	            TaoLog.Logd("Updater", "no update");
 	            //更新结束   销毁
 	            release();
@@ -334,13 +366,28 @@ public class Updater implements OnUpdateListener{
 				
 			}else {
 				//提示用户更新
-				notifyUserUpdate(info,confirm);
-			}
+                if(!mControlByOutSide) {
+                    notifyUserUpdate(info, confirm,false);
+                }else{
+                    if(mUpdateListener!=null){
+                        mUpdateListener.onNeedUpdate();
+                    }
+                }
+
+            }
 		}
 	}
-	
-	private void notifyUserUpdate(UpdateInfo info,
-			DownloadConfirm confirm){
+
+
+    public void showDownloadTip(){
+        if(mTmpConfirm!=null && mTmpUpdateInfo!=null){
+            notifyUserUpdate(mTmpUpdateInfo, mTmpConfirm,true);
+        }
+    }
+
+
+    private void notifyUserUpdate(UpdateInfo info,
+			DownloadConfirm confirm,boolean force){
 		//有更新
 		final Activity currentActivity = getCurrentActivity();
 		if (currentActivity == null) {
@@ -368,7 +415,7 @@ public class Updater implements OnUpdateListener{
 
             int notifyTimes = NotificationRecordStorage.get(info.mVersion);
             // 服务器设置的提醒次数大于0，提示次数有剩余 而且是后台更新
-            if ((info.mRemindNum <= 0 || notifyTimes >= info.mRemindNum) && mBackgroundRequest) {
+            if ((info.mRemindNum <= 0 || notifyTimes >= info.mRemindNum) && mBackgroundRequest && !force) {
 				confirm.cancel();
 				//更新结束   销毁
 				release();
@@ -570,7 +617,7 @@ public class Updater implements OnUpdateListener{
 				return;
 			}
 			//wifi 网络，后台下载
-			notifyUserUpdate(mTmpUpdateInfo,mTmpConfirm);
+			notifyUserUpdate(mTmpUpdateInfo,mTmpConfirm,false);
 		}else{
 			//前台下载则直接提示出错，结束
 			if(mForceDownload){
@@ -798,11 +845,11 @@ public class Updater implements OnUpdateListener{
 	 * 销毁自己
 	 */
 	protected void release(){
-		if(mContext != null && mReceiver != null){
-			mContext.unregisterReceiver(mReceiver);
-			mReceiver = null;
-		}
-		sInstance = null;
+//		if(mContext != null && mReceiver != null){
+//			mContext.unregisterReceiver(mReceiver);
+//			mReceiver = null;
+//		}
+//		sInstance = null;
 	}
 	
 	private void exitApp(){

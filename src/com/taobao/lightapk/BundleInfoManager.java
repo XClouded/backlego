@@ -296,7 +296,7 @@ public class BundleInfoManager {
         }
         boolean flag = true;
         Log.d(TAG,"url = hhh "+mTargetBundleInfo.getUrl());
-        if(mTargetBundleInfo!=null && mTargetBundleInfo.getUrl()==null){
+        if(mTargetBundleInfo!=null && TextUtils.isEmpty(mTargetBundleInfo.getUrl())){
             flag =  BundleInfoManager.instance().resoveBundleUrlFromServer();
         }else if(mTargetBundleInfo!=null){
             List<String> dependencyPkg = mTargetBundleInfo.getDependency();

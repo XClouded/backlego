@@ -1,3 +1,6 @@
 .idea
 gen
-target
+targetjar-libs
+libs/*.jar
+unpacked-aar
+dependencies.txt

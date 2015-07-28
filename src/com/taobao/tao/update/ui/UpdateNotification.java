@@ -120,17 +120,16 @@ public class UpdateNotification{
 			mContext.sendBroadcast(intent);
 			return;
 		}
-		
-        int tipText = R.string.CancelNow;
-//        String useTaoapp = ConfigContainerAdapter.getInstance().getConfig(
-//        		ConfigCenterLifecycleObserver.CONFIG_GROUP_SYSTEM, "update_use_taoapp", "true");
-//        TaoappState state = TaoappUtils.sCheckTaoappState(mContext);
-//        boolean displayTaoapp = (state.mInstall && state.mEnabled && state.mSupportSecurity && TaoappProxy.isNormal(info.mVersion)) && "true".equals(useTaoapp);
-        mDialog = new TBDialog.Builder(activity)
-		.setTitle(R.string.prompt_title).setMessage(info.mNotifyTip+"\n\n更新包大小："+apkSize).setShowPhoneTaoHelpHit(false)
-		.setPositiveButton(Constants.BACKUPDATE, new UpdateConfirm(activity, confirm,false))
-		.setNegativeButton(tipText, new UpdateCancel(confirm) )
-		.setOnCancelListener(new UpdateCancel(confirm)).show();
+		if(!activity.isFinishing()) {
+            try {
+                int tipText = R.string.CancelNow;
+                mDialog = new TBDialog.Builder(activity)
+                        .setTitle(R.string.prompt_title).setMessage(info.mNotifyTip + "\n\n更新包大小：" + apkSize).setShowPhoneTaoHelpHit(false)
+                        .setPositiveButton(Constants.BACKUPDATE, new UpdateConfirm(activity, confirm, false))
+                        .setNegativeButton(tipText, new UpdateCancel(confirm))
+                        .setOnCancelListener(new UpdateCancel(confirm)).show();
+            }catch(Throwable e){}
+        }
 	}
 	//确认下载
 	static class UpdateConfirm implements OnClickListener{

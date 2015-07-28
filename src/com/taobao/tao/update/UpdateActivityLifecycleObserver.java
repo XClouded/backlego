@@ -45,9 +45,9 @@ public class UpdateActivityLifecycleObserver extends AbstractActivityLifecycleCa
 
     @Override
     public void onActivityStarted(Activity activity) {
-        if(!activity.getClass().getName().equals("com.taobao.tao.welcome.Welcome")){
-            Updater.getInstance(activity.getApplicationContext()).update(true);
-        }
+//        if(!activity.getClass().getName().equals("com.taobao.tao.welcome.Welcome")){
+//            Updater.getInstance(activity.getApplicationContext()).update(true);
+//        }
     }
 
     @Override

@@ -71,7 +71,7 @@ public class TaoappProxy {
 		 * new SingleTask(new Runnable() {
 		 * 
 		 * @Override public void run() { if (mService != null) { return; } try {
-		 * mService = Services.get(context, ITaoapp.class); } catch (Exception
+		 * mService = Services.get(context, ITaoapp.class); } catch (Exceptionx
 		 * e) { e.printStackTrace(); }
 		 * 
 		 * mHandler.post(new Runnable() {

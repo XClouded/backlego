@@ -144,7 +144,7 @@ public class BundleNotFoundActivity extends PanguActivity implements View.OnClic
         new AsyncTask<String, Integer, Boolean>() {
             @Override
             protected Boolean doInBackground(String... strings) {
-                if(mTargetBundleInfo!=null && mTargetBundleInfo.getUrl()==null){
+                if(mTargetBundleInfo!=null && TextUtils.isEmpty(mTargetBundleInfo.getUrl())){
                     return BundleInfoManager.instance().resoveBundleUrlFromServer();
                 }else if(mTargetBundleInfo!=null){
                    List<String> dependencyPkg = mTargetBundleInfo.getDependency();
