@@ -148,7 +148,7 @@ public class BundleNotFoundActivity extends PanguActivity implements View.OnClic
                     return BundleInfoManager.instance().resoveBundleUrlFromServer();
                 }else if(mTargetBundleInfo!=null){
                    List<String> dependencyPkg = mTargetBundleInfo.getDependency();
-                   if(dependencyPkg!=null){
+                   if(dependencyPkg!=null && dependencyPkg.size()>0){
                        for(String pkg : dependencyPkg){
                           BundleListing.BundleInfo info =  BundleInfoManager.instance().getBundleInfoByPkg(pkg);
                           if(info!=null && TextUtils.isEmpty(info.getUrl())){

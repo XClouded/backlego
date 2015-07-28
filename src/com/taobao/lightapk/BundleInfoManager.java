@@ -345,7 +345,7 @@ public class BundleInfoManager {
         if(!mBatchBundleDownloader.isRunning()) {
             ArrayList<String> pkgs = new ArrayList<String>();
             pkgs.add(mTargetBundleInfo.getPkgName());
-            if (mTargetBundleInfo.getDependency() != null) {
+            if (mTargetBundleInfo.getDependency() != null && mTargetBundleInfo.getDependency().size()>0) {
                 pkgs.addAll(mTargetBundleInfo.getDependency());
             }
 
