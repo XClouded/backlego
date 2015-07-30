@@ -203,73 +203,73 @@ public class Updater implements OnUpdateListener{
 	 * @param background	是否为后台请求
 	 */
 	public void update(boolean background) {
-//	    if(background && (System.currentTimeMillis() - sLastCheckTime < CHECK_INTERVAL)){
-//	        TaoLog.Logd("Updater", "no need to update");
-//	        return;
-//	    }
-//
-//        if(mTmpUpdateInfo!=null && mTmpConfirm!=null && !background && mControlByOutSide && mUpdateListener!=null){
-//            if((mTmpUpdateInfo.mApkDLUrl == null || mTmpUpdateInfo.mApkDLUrl.length() == 0)
-//                    && (mTmpUpdateInfo.mPatchDLUrl == null || mTmpUpdateInfo.mPatchDLUrl.length() == 0)){
-//                mUpdateListener.onNoUpdate();
-//            }else{
-//                mUpdateListener.onNeedUpdate();
-//            }
-//            return;
-//        }
-//
-//        sLastCheckTime = System.currentTimeMillis();
-//		// 罗喉，去掉所有渠道更新时间延迟判断。
-//		// int status = getUpdateStatus();
-//		// TaoLog.Logd(TaoLog.TAOBAO_TAG, "init autoUpdateCheck status "+status);
-//		// if(UPDATE_UNKNOW==status||UPDATE_DISABLE==status){
-//		// return ;
-//		// }
-//		TaoLog.Logd("Updater", "update:"+background);
-//		// 如果是联想手机，手动升级提示去联想商店升级
-//		if (Constants.isLephone()) {
-//			if (!mBackgroundRequest) {
-//				Constants.showToast(R.string.updata_lephone_text);
-//			}
-//			// 联想手机无自动升级功能??
-//			return;
-//		}
-//
-//		if(mBackgroundDownload){
-//			//正在进行后台下载，用户点击更新时，重新发起流程
-//			if(mTmpConfirm != null)
-//				mTmpConfirm.cancel();
-//			if(mBackgroundInstall != null)
-//				mBackgroundInstall.cancel(true);
-//		}
-//		String version = "";
-//		if(sAtlasDDSuccess){
-//			//FIXME: PackageInfo packageInfo = AtlasDD.getInstance().getLastestApkInfo();
-//		    PackageInfo packageInfo = null;
-//			if(packageInfo != null)
-//				version = packageInfo.versionName;
-//		}else{
-//			version = Globals.getVersionName();
-//		}
-//		//TODO:主客更新请求及bundle更新请求版本，需要服务端处理！
-//		if(mUpdate.request(getApkPath(), TaoApplication.getTTIDNum(), version)){
-//			//启动新的更新
-//			mBackgroundRequest = background;
-//			mTmpConfirm = null;
-////			mTmpUpdateInfo = null;
-//		}else{
-//			//更新已经启动
-//			if(!mBackgroundRequest){
-//				//上次进行的是用于启动更新，则提示用户稍等
-//				Constants.showToast(R.string.notice_update_checking);
-//			}
-//			if(!background){
-//
-//				//已经在更新，用户点击更新可以改变更新状态
-//				mBackgroundRequest = background;
-//
-//			}
-//		}
+	    if(background && (System.currentTimeMillis() - sLastCheckTime < CHECK_INTERVAL)){
+	        TaoLog.Logd("Updater", "no need to update");
+	        return;
+	    }
+
+        if(mTmpUpdateInfo!=null && mTmpConfirm!=null && !background && mControlByOutSide && mUpdateListener!=null){
+            if((mTmpUpdateInfo.mApkDLUrl == null || mTmpUpdateInfo.mApkDLUrl.length() == 0)
+                    && (mTmpUpdateInfo.mPatchDLUrl == null || mTmpUpdateInfo.mPatchDLUrl.length() == 0)){
+                mUpdateListener.onNoUpdate();
+            }else{
+                mUpdateListener.onNeedUpdate();
+            }
+            return;
+        }
+
+        sLastCheckTime = System.currentTimeMillis();
+		// 罗喉，去掉所有渠道更新时间延迟判断。
+		// int status = getUpdateStatus();
+		// TaoLog.Logd(TaoLog.TAOBAO_TAG, "init autoUpdateCheck status "+status);
+		// if(UPDATE_UNKNOW==status||UPDATE_DISABLE==status){
+		// return ;
+		// }
+		TaoLog.Logd("Updater", "update:"+background);
+		// 如果是联想手机，手动升级提示去联想商店升级
+		if (Constants.isLephone()) {
+			if (!mBackgroundRequest) {
+				Constants.showToast(R.string.updata_lephone_text);
+			}
+			// 联想手机无自动升级功能??
+			return;
+		}
+
+		if(mBackgroundDownload){
+			//正在进行后台下载，用户点击更新时，重新发起流程
+			if(mTmpConfirm != null)
+				mTmpConfirm.cancel();
+			if(mBackgroundInstall != null)
+				mBackgroundInstall.cancel(true);
+		}
+		String version = "";
+		if(sAtlasDDSuccess){
+			//FIXME: PackageInfo packageInfo = AtlasDD.getInstance().getLastestApkInfo();
+		    PackageInfo packageInfo = null;
+			if(packageInfo != null)
+				version = packageInfo.versionName;
+		}else{
+			version = Globals.getVersionName();
+		}
+		//TODO:主客更新请求及bundle更新请求版本，需要服务端处理！
+		if(mUpdate.request(getApkPath(), TaoApplication.getTTIDNum(), version)){
+			//启动新的更新
+			mBackgroundRequest = background;
+			mTmpConfirm = null;
+//			mTmpUpdateInfo = null;
+		}else{
+			//更新已经启动
+			if(!mBackgroundRequest){
+				//上次进行的是用于启动更新，则提示用户稍等
+				Constants.showToast(R.string.notice_update_checking);
+			}
+			if(!background){
+
+				//已经在更新，用户点击更新可以改变更新状态
+				mBackgroundRequest = background;
+
+			}
+		}
 	}
 	
 	
