@@ -13,7 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.taobao.lightapk.LightActivityManager;
 import com.taobao.tao.Globals;
-import com.taobao.tao.TBDialog;
+import com.taobao.tao.util.TBDialog;
 import com.taobao.tao.util.ActivityHelper;
 import com.taobao.tao.util.CacheFileUtil;
 import com.taobao.lego.R;
