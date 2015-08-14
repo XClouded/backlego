@@ -380,8 +380,8 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
                         if(isAppRunningBackground()) {
                             BundleInstalledExitAppReceiver.cancelAlarmService();
                             UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver", "Bundle安装成功，开始杀进程");
-                            android.os.Process.killProcess(android.os.Process.myPid());
                             ActivityHelper.kill();
+                            android.os.Process.killProcess(android.os.Process.myPid());
                         }
                     }
                 },8000);

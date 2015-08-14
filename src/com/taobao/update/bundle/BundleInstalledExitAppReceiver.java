@@ -7,10 +7,14 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
+import com.taobao.tao.update.UpdateActivityLifecycleObserver;
 import com.taobao.update.UpdateUserTrack;
+import com.taobao.tao.util.ActivityHelper;
 
 public class BundleInstalledExitAppReceiver extends BroadcastReceiver {
     private static final String KILLER_ACTION = "com.taobao.update.bundle.action.BUNDLEINSTALLED_EXIT_APP";
@@ -36,12 +40,14 @@ public class BundleInstalledExitAppReceiver extends BroadcastReceiver {
         if ((TaoApplication.getProcessName(Globals.getApplication())).equals(taoPackageName)) {
             cancelAlarmService();
             UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver", "Bundle安装成功，开始杀进程");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            android.os.Process.killProcess(android.os.Process.myPid());
+            UpdateActivityLifecycleObserver.clearActivityStack();
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ActivityHelper.kill();
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
+            }, 500);
             UpdateUserTrack.bundleUpdateTrack("BundleInstalledExitAppReceiver", "Bundle安装成功，杀进程失败");
         }
     }
