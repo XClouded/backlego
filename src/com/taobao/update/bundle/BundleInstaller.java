@@ -421,21 +421,23 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
         }
         
     }
-    // 动态部署成功后，更新清单信息（极简包引入）
+    // 动态部署成功后，更新清单信息
     private void buildBundleInventory(String oldVersion,String newVersion,BundleBaselineInfo mBaselineInfo){
     	if(!oldVersion.equals(newVersion)){
     		List<BundleUpdateInfo> bundleList = mBaselineInfo.getBundleUpdateList();
     		List<BundleListing.BundleInfo> inventoryList = new ArrayList<BundleListing.BundleInfo>();   		
     		if(bundleList!=null && bundleList.size() >0){
     			for(BundleUpdateInfo bundleInfo:bundleList){
-    				BundleListing.BundleInfo inventory = new  BundleListing.BundleInfo();
-    				inventory.setPkgName(bundleInfo.mBundleName);
-    				inventory.setDependency(bundleInfo.dependencies);
-    				inventory.setUrl(bundleInfo.mBundleDLUrl);
-    				inventory.setSize(bundleInfo.mBundleSize);
-    				inventory.setVersion(bundleInfo.mVersion);
-    				inventory.setMd5(bundleInfo.mNewBundleMD5);
-    				inventoryList.add(inventory);
+                    if(bundleInfo.mBundleName!=null && !bundleInfo.mBundleName.equals("com.taobao.maindex")) {
+                        BundleListing.BundleInfo inventory = new BundleListing.BundleInfo();
+                        inventory.setPkgName(bundleInfo.mBundleName);
+                        inventory.setDependency(bundleInfo.dependencies);
+                        inventory.setUrl(bundleInfo.mBundleDLUrl);
+                        inventory.setSize(bundleInfo.mBundleSize);
+                        inventory.setVersion(bundleInfo.mVersion);
+                        inventory.setMd5(bundleInfo.mNewBundleMD5);
+                        inventoryList.add(inventory);
+                    }
     			}
     		}
     		AtlasBundleInfoManager.instance().saveNewBundlelisingWithMerge(inventoryList, newVersion);
