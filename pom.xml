@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.taobao.android</groupId>
         <artifactId>parent-pom</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <groupId>com.taobao.android</groupId>
     <artifactId>update</artifactId>
@@ -23,65 +23,95 @@
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>support-v4</artifactId>
+            <type>jar</type> 
+            <scope>provided</scope>   
+            <version>21.0.2</version>
         </dependency>
         <dependency>
+            
             <groupId>com.google.android</groupId>
+            
             <artifactId>android</artifactId>
+            
+            <version>4.4.2</version>
+            
+        </dependency>
+
+        <dependency>
+            
+            <groupId>com.taobao.android</groupId>
+            
+            <artifactId>taobao_passivelocation_common</artifactId>
+            
+            <version>1.2.0-build-3</version>
+            
             <scope>provided</scope>
+            
         </dependency>
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>uikit_core</artifactId>
-            <type>aar</type>
-        </dependency>
-                <dependency>
-            <groupId>com.taobao.android</groupId>
-            <artifactId>taobao_passivelocation_common</artifactId>
+            <version>2.3.1</version>
             <scope>provided</scope>
+            <type>aar</type>
         </dependency>
 
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>uikit_extends</artifactId>
+            <version>2.3.4.1</version>
+            <scope>provided</scope>
             <type>aar</type>
         </dependency>
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>mtopwvplugin</artifactId>
+            <version>1.0.8</version>
         </dependency>
-        <dependency>
+         <dependency>
+            
             <groupId>com.taobao.android</groupId>
+            
             <artifactId>taobao_config</artifactId>
+            
+            <version>1.0.0</version>
+            
         </dependency>
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>tao_sdk</artifactId>
+            <version>1.21.0.11</version>
         </dependency>
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>usertrack</artifactId>
+            <version>5.0.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>atlas</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>2.3.73</version>
         </dependency>
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>remote_business</artifactId>
+            <version>1.1.5</version>
         </dependency>
         <dependency>
+            
             <groupId>com.taobao.android</groupId>
+            
             <artifactId>updatedownloader</artifactId>
+            <scope>provided</scope>
+            <version>1.0.0</version>
+            
         </dependency>
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>ski</artifactId>
+            <version>2.0.13.1</version>
         </dependency>
-        <dependency>
-            <groupId>com.taobao.android</groupId>
-            <artifactId>lbs</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>taobao_configcenter</artifactId>
@@ -91,11 +121,9 @@
                     <artifactId>mtopsdk_mtop</artifactId>
                 </exclusion>
             </exclusions>
+            <version>1.3.7.1</version>
         </dependency>
-        <dependency>
-            <groupId>android.taobao.weakconceal</groupId>
-            <artifactId>android_weakconceal</artifactId>
-        </dependency>
+        
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>mtopsdk_persistent</artifactId>
@@ -109,6 +137,7 @@
                     <artifactId>mtopsdk_security</artifactId>
                 </exclusion>
             </exclusions>
+            <version>1.4.7.11</version>
         </dependency>
 
     <!--     <dependency>
@@ -120,6 +149,7 @@
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>appcompat</artifactId>
+            <version>2.0.6-SNAPSHOT</version>
             <type>aar</type>
         </dependency>
         <dependency>
@@ -132,7 +162,7 @@
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>taobaocompat</artifactId>
-            <version>2.10.3.30-SNAPSHOT</version>
+            <version>2.10.4.2</version>
             <type>aar</type>
             <scope>provided</scope>
         </dependency>
