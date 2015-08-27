@@ -13,10 +13,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
+import android.os.*;
 import android.provider.Settings;
 import android.taobao.atlas.framework.Atlas;
 import android.taobao.atlas.framework.BundleImpl;
@@ -198,6 +195,23 @@ public class Updater implements OnUpdateListener{
     }
 
 
+    public static long getUsableSpace(File path) {
+        if (path == null) {
+            return -1;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            return path.getUsableSpace();
+        } else {
+            if (!path.exists()) {
+                return 0;
+            } else {
+                final StatFs stats = new StatFs(path.getPath());
+                return (long) stats.getBlockSize() * (long) stats.getAvailableBlocks();
+            }
+        }
+    }
+
+
     /**
 	 * 请求更新
 	 * @param background	是否为后台请求
@@ -207,6 +221,13 @@ public class Updater implements OnUpdateListener{
 	        TaoLog.Logd("Updater", "no need to update");
 	        return;
 	    }
+
+        if(getUsableSpace(Environment.getDataDirectory())<50*1024*1024){
+            if(mUpdateListener!=null){
+                mUpdateListener.onNoUpdate();
+                return;
+            }
+        }
 
         if(mTmpUpdateInfo!=null && mTmpConfirm!=null && !background && mControlByOutSide && mUpdateListener!=null){
             if((mTmpUpdateInfo.mApkDLUrl == null || mTmpUpdateInfo.mApkDLUrl.length() == 0)
