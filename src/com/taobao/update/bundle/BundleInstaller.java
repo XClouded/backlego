@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.taobao.atlas.bundleInfo.AtlasBundleInfoManager;
 import android.taobao.atlas.framework.Atlas;
+import android.taobao.atlas.runtime.InstrumentationHook;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -138,6 +139,7 @@ public class BundleInstaller extends AsyncTask<Void, Void, Boolean>{
                 UpdateUserTrack.bundleUpdateTrack("BundleInstaller","Atlas bundle批量安装失败! "+e.getMessage());
             }
             if(isSucess){
+                InstrumentationHook.notifyAppUpdated();
                 AppMonitor.Counter.commit("dynamicDeploy", "bundleInstalled", mBaselineInfo.getmBaselineVersion(),1);
                 UpdateUserTrack.bundleUpdateTrack("BundleInstaller","Atlas bundle安装成功!!本次bundle更新主版本：" + TaoApplication.getVersion() + "本次bundle更新基线版本："+ mBaselineInfo.getmBaselineVersion());
                 oldVersion = Globals.getVersionName();
