@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.taobao.atlas.framework.Framework;
+import android.taobao.atlas.runtime.RuntimeVariables;
+import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.taobao.tao.Globals;
 
@@ -83,7 +88,31 @@ public class BaselineInfoProvider {
     /**
      * @return the mainVersionCode
      */
+    public static boolean deleteSOBundle = false;
     public int getMainVersionCode() {
+        /////////////////patch///////////
+        if(!deleteSOBundle){
+            deleteSOBundle = true;
+            try {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(RuntimeVariables.androidApplication);
+                if (mainVersionName != null && mainVersionName.equals("5.3.4") && !preferences.getBoolean("deleteSoBundleSuccess", false)) {
+                    //delete bundle
+                    String BASEDIR = RuntimeVariables.androidApplication.getFilesDir().getAbsolutePath();
+                    String STORAGE_LOCATION = BASEDIR + File.separatorChar + "storage" + File.separatorChar;
+                    File alipayBundleDir = new File(STORAGE_LOCATION, "com.taobao.taobao.alipay");
+                    if (alipayBundleDir.exists()) {
+                        Framework.deleteDirectory(alipayBundleDir);
+                    }
+                    File qupaiBundleDir = new File(STORAGE_LOCATION, "com.taobao.taorecoder");
+                    if (qupaiBundleDir.exists()) {
+                        Framework.deleteDirectory(qupaiBundleDir);
+                    }
+                    preferences.edit().putBoolean("deleteSoBundleSuccess", true).apply();
+                }
+                Log.e("BaselineInfoProvider","delete so bundle success");
+            }catch(Throwable e){}
+        }
+        /////////////////patch///////////
         return mainVersionCode;
     }
     
