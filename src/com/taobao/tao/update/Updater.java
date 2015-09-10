@@ -17,6 +17,7 @@ import android.os.*;
 import android.provider.Settings;
 import android.taobao.atlas.framework.Atlas;
 import android.taobao.atlas.framework.BundleImpl;
+import android.taobao.atlas.wrapper.BaselineInfoManager;
 import android.taobao.util.NetWork;
 import android.taobao.util.TaoLog;
 import android.text.TextUtils;
@@ -347,7 +348,7 @@ public class Updater implements OnUpdateListener{
 		        return ;
 		    }
             if(!TextUtils.isEmpty(info.rollback)){
-                rollback();
+                BaselineInfoManager.instance().rollback();
                 return;
             }
 		    if((info.mApkDLUrl == null || info.mApkDLUrl.length() == 0)
@@ -1018,19 +1019,5 @@ public class Updater implements OnUpdateListener{
         }catch(Throwable e){
             e.printStackTrace();
         }
-    }
-
-    private void rollback()
-    {
-        BundleInstaller installer  = new BundleInstaller();
-        installer.rollback();
-    }
-
-    public static boolean needRollback(){
-        return BundleInstaller.needRollback();
-    }
-
-    public static void removeBaseLineInfo(){
-        BundleInstaller.removeBaseLineInfo();
     }
 }

@@ -46,6 +46,7 @@ public class BundleInfoManager {
         if(sManager==null){
             sManager = new BundleInfoManager();
         }
+        Log.d("BaselineInfoProvider","sdfsdfsdfsdfsdfsdfsdfsdf");
         return sManager;
     }
 
