@@ -188,7 +188,7 @@ public class BundleInfoManager {
     }
 
     public synchronized void resolveInternalBundles() {
-        if(sInternalBundles!=null){
+        if(sInternalBundles==null || sInternalBundles.size()==0){
             ClassLoadFromBundle.resolveInternalBundles();
             sInternalBundles = ClassLoadFromBundle.sInternalBundles;
         }
