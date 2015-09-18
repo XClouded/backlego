@@ -6,6 +6,7 @@ import android.os.StatFs;
 import android.taobao.atlas.bundleInfo.AtlasBundleInfoManager;
 import android.taobao.atlas.bundleInfo.BundleListing;
 import android.taobao.atlas.framework.Atlas;
+import android.taobao.atlas.runtime.ClassLoadFromBundle;
 import android.text.TextUtils;
 import android.util.Log;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListRequest;
@@ -46,7 +47,6 @@ public class BundleInfoManager {
         if(sManager==null){
             sManager = new BundleInfoManager();
         }
-        Log.d("BaselineInfoProvider","sdfsdfsdfsdfsdfsdfsdfsdf");
         return sManager;
     }
 
@@ -158,7 +158,7 @@ public class BundleInfoManager {
     private final String HIGH_PRIORITY_BUNDLES_FORDOWNLOAD = "HIGH_PRIORITY_BUNDLES_FORDOWNLOAD";
     private void storeHighPriorityBundles(List<String> pkgs){
         String joined = TextUtils.join(", ", pkgs);
-        AppPreference.putString(HIGH_PRIORITY_BUNDLES_FORDOWNLOAD,joined);
+        AppPreference.putString(HIGH_PRIORITY_BUNDLES_FORDOWNLOAD, joined);
     }
 
     public void updateHighPriorityBundleByRemove(String[] pkgs){
@@ -188,30 +188,9 @@ public class BundleInfoManager {
     }
 
     public synchronized void resolveInternalBundles() {
-        if(sInternalBundles !=null && sInternalBundles.size()!=0)
-            return ;
-        String prefix = "lib/armeabi/libcom_";
-        String suffix = ".so";
-        sInternalBundles = new ArrayList<String>();
-        ZipFile zipFile = null;
-        try {
-            zipFile = new ZipFile(Globals.getApplication().getApplicationInfo().sourceDir);
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry zipEntry = entries.nextElement();
-                String entryName = zipEntry.getName();
-                if (entryName.startsWith(prefix) && entryName.endsWith(suffix)) {
-                    sInternalBundles.add(getPackageNameFromEntryName(entryName));
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Exception while get bundles in assets or lib", e);
-        }finally {
-            try{
-                if(zipFile!=null){
-                    zipFile.close();
-                }
-            }catch(Exception e){}
+        if(sInternalBundles!=null){
+            ClassLoadFromBundle.resolveInternalBundles();
+            sInternalBundles = ClassLoadFromBundle.sInternalBundles;
         }
     }
 
