@@ -24,8 +24,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
+
 import com.alibaba.mtl.appmonitor.AppMonitor;
+import com.taobao.lightapk.BundleInfoManager;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListRequest;
+import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListResponseData;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
 import com.taobao.tao.update.business.MtopTaobaoClientAppUpdateTrackRequest;
@@ -43,6 +46,8 @@ import com.taobao.update.bundle.BundleBaselineInfo;
 import com.taobao.update.bundle.BundleDownloader;
 import com.taobao.update.bundle.BundleInstaller;
 import com.taobao.update.bundle.BundleUpdateInfo;
+
+import android.taobao.apirequest.ApiResponse;
 import mtopsdk.mtop.domain.MethodEnum;
 import mtopsdk.mtop.domain.MtopResponse;
 import mtopsdk.mtop.intf.Mtop;
@@ -58,6 +63,8 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONObject;
 
 /**
  * @author luohou.lbb 主客户端动态更新版本检测 为修改原淘宝客户端更新逻辑，参见Update类
@@ -186,6 +193,59 @@ public class Updater implements OnUpdateListener{
         }
     }
 
+    
+    
+    /**
+     * 开发环境下测试bundle下载
+     * @param url
+     */
+    public void triggerBundleDownload(String url){
+    	DownloadTask dTask = new DownloadTask();  
+        dTask.execute(url);  
+        
+    }
+    
+    public class DownloadTask extends AsyncTask<String, Void, String>{
+    	
+    	@Override  
+        protected String doInBackground(String... params) { 
+    		try {		 
+    		URL resonseUrl = new URL(params[0]);
+            HttpURLConnection urlConn = (HttpURLConnection) resonseUrl.openConnection();
+            urlConn.setConnectTimeout(5 * 1000);
+            urlConn.connect();
+            if (urlConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int n = 0;
+                while (-1 != (n = urlConn.getInputStream().read(buffer))) {
+                    output.write(buffer, 0, n);
+                }
+                byte[] resultData = output.toByteArray();
+                String rawStr = new String(resultData,"UTF-8");
+                return rawStr;
+    	
+            }
+    		}catch(MalformedURLException e){
+                return null;
+            }catch(IOException e){
+                return null;
+            }
+            return null;
+    	}
+    	   	
+    	@Override  
+        protected void onPostExecute(String result) {  
+             MtopTaobaoClientGetBundleListResponseData mockDataList = new MtopTaobaoClientGetBundleListResponseData();
+    		 ApiResponse response = new ApiResponse();
+//             JSONObject jsObj = response.parseResult(result).data;
+             BundleDownloadHelper.parseResponse(response, result, mockDataList);
+             
+    	    BundleInfoManager.instance().updateBundleDownloadInfo(mockDataList);
+    	        Constants.showToast(Globals.getApplication(),"bundle下载更新完成...(仅内测使用)"); 
+            super.onPostExecute(result);  
+        }  
+    }
 
     public void setUpdateListener(UpdateLister listener){
         mUpdateListener = listener;
