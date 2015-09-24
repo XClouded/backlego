@@ -50,7 +50,8 @@ public class ClassNotFoundInterceptor implements ClassNotFoundInterceptorCallbac
         }
         boolean downloadGuide = false;
         if(BundleInfoManager.sInternalBundles==null){
-            downloadGuide = Globals.isMiniPackage() || bundleName.equalsIgnoreCase("com.duanqu.qupai.recorder");
+            downloadGuide = Globals.isMiniPackage() || bundleName.equalsIgnoreCase("com.duanqu.qupai.recorder")
+            || bundleName.equalsIgnoreCase("com.taobao.android.big");
         }else{
             downloadGuide = !BundleInfoManager.sInternalBundles.contains(bundleName) && Atlas.getInstance().getBundle(bundleName)==null;
         }
