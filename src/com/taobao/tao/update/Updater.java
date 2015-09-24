@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.lightapk.BundleInfoManager;
+import com.taobao.lightapk.LightActivityManager;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListRequest;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListResponseData;
 import com.taobao.tao.Globals;
@@ -857,6 +858,8 @@ public class Updater implements OnUpdateListener{
 							"application/vnd.android.package-archive");
 					mContext.startActivity(installIntent);
 					//更新结束   销毁
+					//安装过程中退出app，防止取消安装还能回来正常使用
+					exitApp();
 					release();
 					break;
 				}
@@ -933,8 +936,18 @@ public class Updater implements OnUpdateListener{
 //		}
 //		sInstance = null;
 	}
-	
-	private void exitApp(){
+
+	//统一退出app的逻辑，process.killprocess 会导致
+	// 1. Scheduling restart of crashed service
+	// 2. 设置页面短暂黑屏后又恢复到设置页面
+	public static void exitApp(){
+
+		try{
+			LightActivityManager.finishAll();
+		}catch (Throwable e){
+
+		}
+
 		int pid = android.os.Process.myPid();
 		TaoLog.Logd("Updater", "atlas killprocess:"+pid);
 		android.os.Process.killProcess(pid);

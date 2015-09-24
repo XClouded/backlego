@@ -283,8 +283,7 @@ public class ForceUpdateNotification {
 	}
 	
 	private void exitApp(){
-		int pid = android.os.Process.myPid();
-		android.os.Process.killProcess(pid);
+		Updater.exitApp();
 	}
 	
 	/**
