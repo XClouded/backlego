@@ -9,14 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.*;
-import android.provider.Settings;
 import android.taobao.atlas.framework.Atlas;
-import android.taobao.atlas.framework.BundleImpl;
 import android.taobao.atlas.wrapper.BaselineInfoManager;
 import android.taobao.util.NetWork;
 import android.taobao.util.TaoLog;
@@ -28,7 +24,6 @@ import android.widget.Toast;
 import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.lightapk.BundleInfoManager;
 import com.taobao.lightapk.LightActivityManager;
-import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListRequest;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListResponseData;
 import com.taobao.tao.Globals;
 import com.taobao.tao.TaoApplication;
@@ -50,7 +45,6 @@ import com.taobao.update.bundle.BundleUpdateInfo;
 
 import android.taobao.apirequest.ApiResponse;
 import mtopsdk.mtop.domain.MethodEnum;
-import mtopsdk.mtop.domain.MtopResponse;
 import mtopsdk.mtop.intf.Mtop;
 
 import java.io.ByteArrayOutputStream;
@@ -64,8 +58,6 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONObject;
 
 /**
  * @author luohou.lbb 主客户端动态更新版本检测 为修改原淘宝客户端更新逻辑，参见Update类
@@ -421,9 +413,11 @@ public class Updater implements OnUpdateListener{
 	            TaoLog.Logd("Updater", "no update");
 	            //更新结束   销毁
 	            release();
+                ApkUpdateMonitor.count(ApkUpdateMonitor.NO_UPDATE, null);
 	            return ;
 		    }
 			//存在更新
+            ApkUpdateMonitor.count(ApkUpdateMonitor.HAS_UPDATE, null);
 			TaoLog.Logd("Updater", "update priority: "+info.mPriority);
 			mTmpUpdateInfo = info;
 			mTmpConfirm = confirm;
@@ -663,7 +657,8 @@ public class Updater implements OnUpdateListener{
 	
 	@Override
 	public void onDownloadError(int errorCode, String msg) {
-		TaoLog.Logd("Updater", "update DownloadError: "+msg);
+        ApkUpdateMonitor.count(ApkUpdateMonitor.DOWNLOAD_ERROR,errorCode + ":" + msg);
+		TaoLog.Logd("Updater", "update DownloadError: " + msg);
 		UpdateUserTrack.mTaoUpdateTrack("Updater","主客下载失败  "+msg+" APK INFO: "+getErrorApkInfoForCDN());
 		switch(errorCode){
 		case DefaultDownloader.ERROR_IO:
@@ -823,6 +818,7 @@ public class Updater implements OnUpdateListener{
 					mNotification.remove();
 					//更新结束   销毁
 					release();
+                    ApkUpdateMonitor.count(ApkUpdateMonitor.CANCEL_DOWNLOAD, null);
 					break;
 				}
 				case CANCEL_FORCE_DOWNLOAD:{
@@ -830,6 +826,7 @@ public class Updater implements OnUpdateListener{
 					mUpdate.cancelDownload();
 					//更新结束   销毁
 					release();
+                    ApkUpdateMonitor.count(ApkUpdateMonitor.CANCEL_DOWNLOAD, null);
 					break;
 				}
 				case INSTALL:{
@@ -844,6 +841,7 @@ public class Updater implements OnUpdateListener{
 					mNotification.remove();
 					//更新结束   销毁
 					release();
+                    ApkUpdateMonitor.count(ApkUpdateMonitor.SUCCESS, null);
 					break;
 				}
 				case FORCE_INSTALL:{
@@ -859,8 +857,9 @@ public class Updater implements OnUpdateListener{
 					mContext.startActivity(installIntent);
 					//更新结束   销毁
 					//安装过程中退出app，防止取消安装还能回来正常使用
-					exitApp();
+                    ApkUpdateMonitor.count(ApkUpdateMonitor.SUCCESS_FORCE, null);
 					release();
+                    exitApp();
 					break;
 				}
 				
