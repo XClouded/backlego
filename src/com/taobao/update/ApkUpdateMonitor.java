@@ -17,7 +17,7 @@ public class ApkUpdateMonitor {
     public static final String SUCCESS = "success";
     public static final String SUCCESS_FORCE = "success_force";
 
-    public static final String MODULE = "apkUpdate";
+    public static final String MODULE = "update";
 
     public static void count(String step, String args) {
         if (TextUtils.isEmpty(args)) {
