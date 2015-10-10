@@ -19,11 +19,13 @@ public class ApkUpdateMonitor {
 
     public static final String MODULE = "update";
 
+    public static final String POINT = "apkupdate";
+
     public static void count(String step, String args) {
         if (TextUtils.isEmpty(args)) {
-            AppMonitor.Counter.commit(MODULE, step, 1);
+            AppMonitor.Counter.commit(MODULE, POINT, step, 1);
         } else {
-            AppMonitor.Counter.commit(MODULE, step, args, 1);
+            AppMonitor.Counter.commit(MODULE, POINT, step + ":" + args, 1);
         }
     }
 
