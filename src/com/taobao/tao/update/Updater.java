@@ -430,9 +430,9 @@ public class Updater implements OnUpdateListener{
 			 * 静默更新C：不区分网络，全静默更新。（此功能会偷偷吃用户流量，但一般不开启，留作应急用，比如客户端出现重大bug等）
 			 * 
 			 */
-//			if(info.mPriority == 2 && mBackgroundRequest){// mPriority＝2，静默更新，交由服务端完全控制更新策略，正常状态返回 0 或者 1，或者默认值 -1
-//				mBackgroundDownload = true;
-//				confirm.download();
+			if(info.mPriority == 2 && mBackgroundRequest){// mPriority＝2，静默更新，交由服务端完全控制更新策略，正常状态返回 0 或者 1，或者默认值 -1
+				mBackgroundDownload = true;
+				confirm.download();
 //
 //			}else if(NetWork.CONN_TYPE_WIFI.equals(NetWork.getNetConnType(Globals.getApplication())) && mBackgroundRequest){
 //				//wifi网络，先下载更新，再提示用户
@@ -441,7 +441,7 @@ public class Updater implements OnUpdateListener{
 //					mForceDownload = false;
 //				confirm.download();
 //
-//			}else {
+			}else {
 				//提示用户更新
                 if(!mControlByOutSide) {
                     notifyUserUpdate(info, confirm,false);
@@ -451,7 +451,7 @@ public class Updater implements OnUpdateListener{
                     }
                 }
 
-//            }
+            }
 		}
 	}
 
