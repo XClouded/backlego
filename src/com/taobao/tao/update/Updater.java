@@ -507,6 +507,9 @@ public class Updater implements OnUpdateListener{
                 NotificationRecordStorage.update(info.mVersion, info.mRemindNum);
             }
 		}
+
+		ApkUpdateMonitor.count(ApkUpdateMonitor.POP_UPDATE_NOTIFY,null);
+
 	}
 	
 	@Override
@@ -565,6 +568,9 @@ public class Updater implements OnUpdateListener{
 
 	//提示用户安装
 	private void notifyUserInstall(String apkPath,UpdateInfo updateInfo){
+
+		ApkUpdateMonitor.count(ApkUpdateMonitor.POP_INSTALL_NOTIFY,null);
+
 		if (updateInfo.mPriority == 1){
 			//强制更新dialog
 			mForceNotification.finished(apkPath,updateInfo.mNotifyTip);

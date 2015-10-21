@@ -17,6 +17,7 @@ import com.taobao.tao.util.BuiltConfig;
 import com.taobao.tao.util.Constants;
 import com.taobao.tao.util.TBDialog;
 import com.taobao.lego.R;
+import com.taobao.update.ApkUpdateMonitor;
 import com.taobao.update.Update.DownloadConfirm;
 import com.taobao.update.UpdateInfo;
 
@@ -143,6 +144,7 @@ public class UpdateNotification{
 		}
 		@Override
 		public void onClick(View v) {
+			ApkUpdateMonitor.count(ApkUpdateMonitor.CONFIRM_DOWNLOAD,null);
 				if(mGotoTaoapp && TaoappUtils.gotoTaobaoDetail(activity)){
 					mTmpDownloadConfirm.cancel();
 					TBS.Adv.ctrlClicked(CT.Button,"UpdateFromPhoneTaoHelpConfirm");
@@ -160,11 +162,13 @@ public class UpdateNotification{
 		}
 		@Override
 		public void onClick(View v) {
+			ApkUpdateMonitor.count(ApkUpdateMonitor.CANCEL_DOWNLOAD,null);
 			mTmpDownloadConfirm.cancel();
 			TBS.Adv.ctrlClicked(CT.Button, "UpdateCancel");
 		}
 		@Override
 		public void onCancel(DialogInterface dialog) {
+			ApkUpdateMonitor.count(ApkUpdateMonitor.CANCEL_DOWNLOAD,null);
 			mTmpDownloadConfirm.cancel();
 			TBS.Adv.ctrlClicked(CT.Button, "UpdateCancel");
 		}
