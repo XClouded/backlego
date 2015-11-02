@@ -5,14 +5,17 @@ package com.taobao.update.bundle;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.StatFs;
 import android.taobao.atlas.framework.Atlas;
 import android.util.Log;
+
 import com.alibaba.mtl.appmonitor.AppMonitor;
 import com.taobao.tao.util.StringUtil;
 import com.taobao.update.*;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -331,6 +334,7 @@ public class BundleDownloader implements Downloader{
                 while( (length = bundleBuffer.read(buffer, 0, BUFFER_SIZE)) > 0){
                     bundleChannel.write(ByteBuffer.wrap(buffer,0,length));
                 }
+               
                 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -338,6 +342,17 @@ public class BundleDownloader implements Downloader{
             }catch (IllegalStateException e) {
                 e.printStackTrace();
                 return false;
+            }finally{
+            	if(null!= bundleOutput)
+            	 bundleOutput.close();
+            	if(null!=bundleBuffer)
+                 bundleBuffer.close();
+            	if(null!=bundleChannel)
+                 bundleChannel.close();
+            	if(null!=bundleInput)
+                 bundleInput.close(); 
+            	if(null!=mClient)
+                 mClient.close();
             }
             if(tempFile.exists() && tempFile.length()==mFileSize){
                 tempFile.renameTo(apkfile);
