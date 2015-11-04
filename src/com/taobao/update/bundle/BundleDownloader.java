@@ -343,16 +343,20 @@ public class BundleDownloader implements Downloader{
                 e.printStackTrace();
                 return false;
             }finally{
-            	if(null!= bundleOutput)
-            	 bundleOutput.close();
-            	if(null!=bundleBuffer)
-                 bundleBuffer.close();
-            	if(null!=bundleChannel)
-                 bundleChannel.close();
-            	if(null!=bundleInput)
-                 bundleInput.close(); 
-            	if(null!=mClient)
-                 mClient.close();
+                try {
+                    if(null!= bundleOutput)
+                     bundleOutput.close();
+                    if(null!=bundleBuffer)
+                     bundleBuffer.close();
+                    if(null!=bundleChannel)
+                     bundleChannel.close();
+                    if(null!=bundleInput)
+                     bundleInput.close();
+                    if(null!=mClient)
+                     mClient.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             if(tempFile.exists() && tempFile.length()==mFileSize){
                 tempFile.renameTo(apkfile);

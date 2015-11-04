@@ -37,7 +37,7 @@ public class BundleInfoManager {
     /**
      * 本地含有的bundle,包括安装和未安装的
      */
-    public static List<String> sInternalBundles;
+    public static Set<String> sInternalBundles;
     private BundleListing currentListing;
 
     private BundleInfoManager(){
