@@ -126,7 +126,7 @@ public class UpdateNotification{
                 int tipText = R.string.CancelNow;
                 mDialog = new TBDialog.Builder(activity)
                         .setTitle(R.string.prompt_title).setMessage(info.mNotifyTip + "\n\n更新包大小：" + apkSize).setShowPhoneTaoHelpHit(false)
-                        .setPositiveButton(Constants.BACKUPDATE, new UpdateConfirm(activity, confirm, false))
+                        .setPositiveButton(Constants.BACKUPDATE, new UpdateConfirm( confirm, false))
                         .setNegativeButton(tipText, new UpdateCancel(confirm))
                         .setOnCancelListener(new UpdateCancel(confirm)).show();
             }catch(Throwable e){}
@@ -135,23 +135,16 @@ public class UpdateNotification{
 	//确认下载
 	static class UpdateConfirm implements OnClickListener{
 		private DownloadConfirm mTmpDownloadConfirm;
-		private Activity activity;
 		private boolean mGotoTaoapp;
-		public UpdateConfirm(Activity activity, DownloadConfirm downloadConfirm,boolean gotoTaoapp){
-			this.activity = activity;
+		public UpdateConfirm( DownloadConfirm downloadConfirm,boolean gotoTaoapp){
 			mTmpDownloadConfirm = downloadConfirm;
 			mGotoTaoapp = gotoTaoapp;
 		}
 		@Override
 		public void onClick(View v) {
 			ApkUpdateMonitor.count(ApkUpdateMonitor.CONFIRM_DOWNLOAD,null);
-				if(mGotoTaoapp && TaoappUtils.gotoTaobaoDetail(activity)){
-					mTmpDownloadConfirm.cancel();
-					TBS.Adv.ctrlClicked(CT.Button,"UpdateFromPhoneTaoHelpConfirm");
-				}else{
-					mTmpDownloadConfirm.download();
-					TBS.Adv.ctrlClicked(CT.Button,"UpdateConfirm");
-				}
+			mTmpDownloadConfirm.download();
+			TBS.Adv.ctrlClicked(CT.Button,"UpdateConfirm");
 		}
 	}
 	//取消下载
