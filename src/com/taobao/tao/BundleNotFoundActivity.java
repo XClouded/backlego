@@ -81,7 +81,7 @@ public class BundleNotFoundActivity extends PanguActivity implements View.OnClic
             }
             autoDownload = mTargetBundleInfo.getSize()<500*1024 && !ConnectivityManagerCompat.isActiveNetworkMetered(
                     (ConnectivityManager)Globals.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE)
-            );
+            ) || mTargetBundleInfo.getSize()<200*1024;
             if(autoDownload){
                 super.onCreate(savedInstanceState);
                 mSafeHandler = new SafeHandler(this);
