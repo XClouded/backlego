@@ -238,13 +238,13 @@ public class BundleNotFoundActivity extends PanguActivity implements View.OnClic
             mSafeHandler.destroy();
         downloadSuccess = true;
         if (!TextUtils.isEmpty(mH5Url)) {
-            Nav.from(BundleNotFoundActivity.this).withExtras(getIntent().getExtras()).toUri(Uri.parse(mH5Url));
+            Nav.from(BundleNotFoundActivity.this).withExtras(ClassNotFoundInterceptor.mBundleKeep).toUri(Uri.parse(mH5Url));
             finish();
         } else {
             if (!TextUtils.isEmpty(mActivityName)) {
                 Intent intent = new Intent();
                 intent.setClassName(BundleNotFoundActivity.this, mActivityName);
-                intent.putExtras(getIntent().getExtras());
+                intent.putExtras(ClassNotFoundInterceptor.mBundleKeep);
                 startActivity(intent);
                 finish();
             } else {

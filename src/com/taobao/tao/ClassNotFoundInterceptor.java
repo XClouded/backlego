@@ -12,7 +12,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.taobao.android.nav.Nav;
 import com.taobao.lightapk.BundleInfoManager;
-
+import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +20,8 @@ public class ClassNotFoundInterceptor implements ClassNotFoundInterceptorCallbac
 
     public final String TAG = "ClassNotFundInterceptor";
     public static final List<String> GO_H5_BUNDLES_IF_NOT_EXISTS = new ArrayList<String>();
+
+    public static Bundle mBundleKeep;
 
     /**
      * 进过一次h5，则主客不退出时一直走h5
@@ -65,7 +67,9 @@ public class ClassNotFoundInterceptor implements ClassNotFoundInterceptorCallbac
                         public void run() {
                             Intent i = new Intent();
                             if(intent.getExtras()!=null) {
-                                i.putExtras(intent.getExtras());
+                                mBundleKeep = intent.getExtras();
+                            } else {
+                                mBundleKeep = null;
                             }
                             i.putExtra(BundleNotFoundActivity.KEY_ACTIVITY, className);
                             i.putExtra(BundleNotFoundActivity.KEY_BUNDLE_PKG, info.getPkgName());
