@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.taobao.android</groupId>
     <artifactId>update</artifactId>
-    <version>1.1.41_sharedPref-SNAPSHOT</version>
+    <version>1.1.41_openSource-SNAPSHOT</version>
     <packaging>aar</packaging>
     <name>taobaolego</name>
     <properties>
@@ -116,7 +116,7 @@
         <dependency>
             <groupId>com.taobao.android</groupId>
             <artifactId>atlas</artifactId>
-            <version>3.0.33_sharedPref-SNAPSHOT</version>
+            <version>3.0.34_openSource-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.taobao.android</groupId>
