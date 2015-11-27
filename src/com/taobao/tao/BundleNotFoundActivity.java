@@ -354,8 +354,8 @@ public class BundleNotFoundActivity extends PanguActivity implements View.OnClic
                     if(mBatchBundleInstaller!=null){
                         mBatchBundleInstaller.setBatchBundleInstallerListener(null);
                     }
-                    finish();
                 }
+                finish();
                 break;
         }
         return false;
