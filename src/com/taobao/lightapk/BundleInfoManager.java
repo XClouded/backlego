@@ -6,7 +6,7 @@ import android.os.StatFs;
 import android.taobao.atlas.bundleInfo.AtlasBundleInfoManager;
 import android.taobao.atlas.bundleInfo.BundleListing;
 import android.taobao.atlas.framework.Atlas;
-import android.taobao.atlas.runtime.BundleInstallOnDemand;
+import android.taobao.atlas.runtime.ClassLoadFromBundle;
 import android.text.TextUtils;
 import android.util.Log;
 import com.taobao.lightapk.dataobject.MtopTaobaoClientGetBundleListRequest;
@@ -189,8 +189,8 @@ public class BundleInfoManager {
 
     public synchronized void resolveInternalBundles() {
         if(sInternalBundles==null || sInternalBundles.size()==0){
-            BundleInstallOnDemand.resolveInternalBundles();
-            sInternalBundles = BundleInstallOnDemand.sInternalBundles;
+            ClassLoadFromBundle.resolveInternalBundles();
+            sInternalBundles = ClassLoadFromBundle.sInternalBundles;
         }
     }
 
